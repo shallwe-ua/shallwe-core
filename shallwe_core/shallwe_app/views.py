@@ -8,9 +8,4 @@ class CustomLoginRequiredMixin(LoginRequiredMixin):
 
 
 class LandingView(TemplateView):
-    template_name = 'shallwe_app/index.html'
-
-
-class SampleRequireSessionLoginView(CustomLoginRequiredMixin, TemplateView):
-    login_url = 'landing'
-    template_name = 'shallwe_app/protected-page.html'
+    template_name = 'index.html'

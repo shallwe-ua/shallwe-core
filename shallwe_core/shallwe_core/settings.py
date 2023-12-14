@@ -71,7 +71,9 @@ ROOT_URLCONF = 'shallwe_core.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            BASE_DIR / 'frontend',
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -83,6 +85,16 @@ TEMPLATES = [
         },
     },
 ]
+
+
+# Add the directory where React build files are located to STATICFILES_DIRS
+STATICFILES_DIRS = [
+    BASE_DIR / 'frontend' / 'static',  # Adjust this path accordingly
+]
+
+# Define the directory where Django collects static files
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
 
 WSGI_APPLICATION = 'shallwe_core.wsgi.application'
 
