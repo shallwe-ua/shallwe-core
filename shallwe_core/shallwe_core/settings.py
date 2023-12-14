@@ -89,7 +89,7 @@ TEMPLATES = [
 
 # Add the directory where React build files are located to STATICFILES_DIRS
 STATICFILES_DIRS = [
-    BASE_DIR / 'frontend' / 'static',  # Adjust this path accordingly
+    BASE_DIR / 'mock_frontend' / 'static',  # Adjust this path accordingly
 ]
 
 # Define the directory where Django collects static files
