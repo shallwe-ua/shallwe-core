@@ -13,6 +13,10 @@ class ReactAppServingView(TemplateView):
     template_name = 'index.html'
 
 
+class GeneralLoginRequiredView(LoginRequiredMixinLandingPreset, ReactAppServingView):
+    pass
+
+
 class LandingView(ReactAppServingView):
 
     def dispatch(self, request, *args, **kwargs):
@@ -23,17 +27,17 @@ class LandingView(ReactAppServingView):
             return super().dispatch(request, *args, **kwargs)
 
 
-class SetupView(LoginRequiredMixinLandingPreset, ReactAppServingView):
+class SetupView(GeneralLoginRequiredView):
     pass
 
 
-class SearchView(LoginRequiredMixinLandingPreset, ReactAppServingView):
+class SearchView(GeneralLoginRequiredView):
     pass
 
 
-class ContactsView(LoginRequiredMixinLandingPreset, ReactAppServingView):
+class ContactsView(GeneralLoginRequiredView):
     pass
 
 
-class SettingsView(LoginRequiredMixinLandingPreset, ReactAppServingView):
+class SettingsView(GeneralLoginRequiredView):
     pass
