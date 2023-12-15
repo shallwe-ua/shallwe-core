@@ -2,3 +2,4 @@
 /.idea/
 **/.env
 **/__pycache__/
+/shallwe_core/staticfiles/

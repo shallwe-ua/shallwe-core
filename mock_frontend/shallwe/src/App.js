@@ -25,6 +25,8 @@ const LogoutButton = () => {
       if (response.ok) {
         // Perform any additional actions upon successful logout
         console.log('Logged out successfully.');
+        // Reload the page
+        window.location.reload(true); // Force a reload from the server
       } else {
         console.error('Logout failed.');
       }
@@ -83,6 +85,24 @@ const Home = () => {
     handleHomeLoad();
   }, []); // Empty dependency array ensures the effect runs only once on mount
 
+  const handleTestGeneralCall = async () => {
+    try {
+      const response = await fetch('/test-gen/', {
+        method: 'GET',
+      });
+
+      if (response.ok) {
+        const responseData = await response.json();
+        console.log('Test General API response:', responseData);
+        // Process the response data as needed
+      } else {
+        console.error('Test General API request failed:', response.status);
+      }
+    } catch (error) {
+      console.error('An error occurred during the request:', error);
+    }
+  };
+
   // Your Home page JSX
   return (
     <div>
@@ -94,16 +114,50 @@ const Home = () => {
       >
         <button>Google Login</button>
       </a>
+      {/* Button to trigger the test-auth API request */}
+      <button onClick={handleTestGeneralCall}>Test Unprotected API (see console)</button>
     </div>
   );
 };
 
-const Setup = () => (
-  <div>
-    <PageWithBigText bgColor="#7FFFD4" pageTitle="Setup" />
-    <LogoutButton />
-  </div>
-);
+const Setup = () => {
+  // Function to handle the test-auth API request
+  const handleTestAuthCall = async () => {
+    try {
+      const token = localStorage.getItem('shallweuaLoginKey'); // Retrieve token from localStorage
+      if (!token) {
+        console.error('No token found in localStorage');
+        return;
+      }
+
+      const response = await fetch('/test-auth/', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Token ${token}`, // Set the Authorization header with the token
+        },
+      });
+
+      if (response.ok) {
+        const responseData = await response.json();
+        console.log('Test Auth API response:', responseData);
+        // Process the response data as needed
+      } else {
+        console.error('Test Auth API request failed:', response.status);
+      }
+    } catch (error) {
+      console.error('An error occurred during the request:', error);
+    }
+  };
+
+  return (
+    <div>
+      <PageWithBigText bgColor="#7FFFD4" pageTitle="Setup" />
+      <LogoutButton />
+      {/* Button to trigger the test-auth API request */}
+      <button onClick={handleTestAuthCall}>Test Token Protected API (see console)</button>
+    </div>
+  );
+};
 
 const Search = () => <PageWithBigText bgColor="#F0E68C" pageTitle="Search" />;
 
