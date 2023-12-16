@@ -1,2 +1,2 @@
-src/App.js:
-REDIRECT_URI
+src/App.js:\
+REDIRECT_URI\
