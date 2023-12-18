@@ -17,9 +17,9 @@ urlpatterns = [
     path('settings/', SettingsView.as_view(), name='page-settings'),
 ]
 
-if env('SHALLWE_BACKEND_MODE') == 'DEV':
+if env('SHALLWE_BACKEND_MODE') in ['DEV', 'QA']:
     from .test_views import SampleAuthenticatedView, SampleGeneralView
     urlpatterns += [
-        path('test-auth/', SampleAuthenticatedView.as_view(), name='test-auth'),
-        path('test-gen/', SampleGeneralView.as_view(), name='test-gen'),
+        path('test-api-protected/', SampleAuthenticatedView.as_view(), name='test-api-protected'),
+        path('test-api-unprotected/', SampleGeneralView.as_view(), name='test-api-unprotected'),
     ]
