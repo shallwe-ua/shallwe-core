@@ -104,13 +104,13 @@ const Home = () => {
   };
 
   // Your Home page JSX
-  // {{REDIRECT_URI}} BELOW ON HREF
+  // {{REDIRECT_URI}} BELOW ON A HREF
   return (
     <div>
       {/* Your existing Home page content */}
       <PageWithBigText bgColor="#FF6347" pageTitle="Home" />
       <a
-        href=`https://accounts.google.com/o/oauth2/v2/auth?redirect_uri=http://127.0.0.1:8000&prompt=consent&response_type=code&client_id=143026764447-q4v3tsd826qj26jlnrivofl24m1vhpjm.apps.googleusercontent.com&scope=openid&access_type=online`
+        href={`https://accounts.google.com/o/oauth2/v2/auth?redirect_uri=127.0.0.1:8000&prompt=consent&response_type=code&client_id=143026764447-q4v3tsd826qj26jlnrivofl24m1vhpjm.apps.googleusercontent.com&scope=openid&access_type=online`}
         rel="noopener noreferrer"
       >
         <button>Google Login</button>
