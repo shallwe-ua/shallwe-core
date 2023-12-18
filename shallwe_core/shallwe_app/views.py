@@ -4,8 +4,7 @@ from django.views.generic import TemplateView
 
 
 class LoginRequiredMixinLandingPreset(LoginRequiredMixin):
-    """Regular LoginRequiredMixin, but without ?next= appending to login page url"""
-    redirect_field_name = ''
+    redirect_field_name = ''    # Cancelling ?next= in URL
     login_url = 'page-landing'
 
 
