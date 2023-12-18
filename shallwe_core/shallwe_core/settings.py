@@ -71,9 +71,7 @@ ROOT_URLCONF = 'shallwe_core.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [
-            BASE_DIR / 'mock_frontend',
-        ],
+        'DIRS': [],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -88,9 +86,7 @@ TEMPLATES = [
 
 
 # Add the directory where React build files are located to STATICFILES_DIRS
-STATICFILES_DIRS = [
-    BASE_DIR / 'mock_frontend' / 'static',  # Adjust this path accordingly
-]
+STATICFILES_DIRS = []
 
 # Define the directory where Django collects static files
 STATIC_ROOT = BASE_DIR / 'staticfiles'
@@ -186,3 +182,31 @@ SOCIALACCOUNT_PROVIDERS = {
        }
    }
 }
+
+
+# Mode-specific settings
+SHALLWE_BACKEND_MODE = env('SHALLWE_BACKEND_MODE')
+
+if SHALLWE_BACKEND_MODE in ['DEV', 'QA']:
+    # Mock Frontend for both 'DEV' and 'QA'
+    TEMPLATES[0]['DIRS'] += [
+        BASE_DIR / 'mock_frontend',
+    ]
+    STATICFILES_DIRS += [
+        BASE_DIR / 'mock_frontend' / 'static',
+    ]
+
+    if SHALLWE_BACKEND_MODE == 'DEV':
+        # Spectacular (API schema generation) for 'DEV' only
+        INSTALLED_APPS += [
+            'drf_spectacular',
+        ]
+        REST_FRAMEWORK |= {
+            'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+        }
+        SPECTACULAR_SETTINGS = {
+            'TITLE': 'Shallwe API',
+            'DESCRIPTION': 'API documentation for shallwe.com.ua',
+            'VERSION': '0.1.0',
+            'SERVE_INCLUDE_SCHEMA': False,
+        }
