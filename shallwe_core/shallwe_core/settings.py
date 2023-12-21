@@ -195,18 +195,3 @@ if SHALLWE_BACKEND_MODE in ['DEV', 'QA']:
     STATICFILES_DIRS += [
         BASE_DIR / 'mock_frontend' / 'static',
     ]
-
-    if SHALLWE_BACKEND_MODE == 'DEV':
-        # Spectacular (API schema generation) for 'DEV' only
-        INSTALLED_APPS += [
-            'drf_spectacular',
-        ]
-        REST_FRAMEWORK |= {
-            'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
-        }
-        SPECTACULAR_SETTINGS = {
-            'TITLE': 'Shallwe API',
-            'DESCRIPTION': 'API documentation for shallwe.com.ua',
-            'VERSION': '0.1.0',
-            'SERVE_INCLUDE_SCHEMA': False,
-        }
