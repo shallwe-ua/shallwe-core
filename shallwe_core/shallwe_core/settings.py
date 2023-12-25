@@ -186,12 +186,11 @@ SOCIALACCOUNT_PROVIDERS = {
 
 # Mode-specific settings
 SHALLWE_BACKEND_MODE = env('SHALLWE_BACKEND_MODE')
+FRONTEND_DIR = 'mock_frontend' if SHALLWE_BACKEND_MODE in ['DEV', 'QA'] else 'frontend'
 
-if SHALLWE_BACKEND_MODE in ['DEV', 'QA']:
-    # Mock Frontend for both 'DEV' and 'QA'
-    TEMPLATES[0]['DIRS'] += [
-        BASE_DIR / 'mock_frontend',
-    ]
-    STATICFILES_DIRS += [
-        BASE_DIR / 'mock_frontend' / 'static',
-    ]
+TEMPLATES[0]['DIRS'] += [
+    BASE_DIR / FRONTEND_DIR,
+]
+STATICFILES_DIRS += [
+    BASE_DIR / FRONTEND_DIR / 'static',
+]
