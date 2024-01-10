@@ -52,7 +52,8 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
     'shallwe_auth',
-    'shallwe_app'
+    'shallwe_app',
+    'shallwe_locations',
 ]
 
 MIDDLEWARE = [
@@ -165,6 +166,7 @@ AUTHENTICATION_BACKENDS = [
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
+
 # Django Allauth Settings
 SITE_ID = 1
 ACCOUNT_EMAIL_VERIFICATION = 'none'
@@ -182,6 +184,10 @@ SOCIALACCOUNT_PROVIDERS = {
        }
    }
 }
+
+
+# Shallwe locations setting
+DEFAULT_KATOTTG_CSV_PATH = BASE_DIR / 'shallwe_locations' / 'locations_src' / 'katottg.csv'
 
 
 # Mode-specific settings
