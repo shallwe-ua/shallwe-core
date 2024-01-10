@@ -19,7 +19,10 @@ from django.urls import path, include
 
 
 urlpatterns = [
+    path('', include('shallwe_app.urls')),
     path('admin/', admin.site.urls),
-    path('api/rest/auth/', include('shallwe_auth.urls')),
-    path('', include('shallwe_app.urls'))
+    path('api/rest/', include([
+        path('auth/', include('shallwe_auth.urls')),
+        path('locations/', include('shallwe_locations.urls')),
+    ])),
 ]

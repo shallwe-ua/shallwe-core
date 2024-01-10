@@ -29,6 +29,10 @@ class Location(models.Model):
     city = models.ForeignKey('self', on_delete=models.DO_NOTHING, null=True, db_column='city_autocode')
 
     class Meta:
+        ordering = [
+            'hierarchy'
+        ]
+
         constraints = [
             # City District category constraints
             CheckConstraint(
