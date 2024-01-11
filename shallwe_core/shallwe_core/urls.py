@@ -24,5 +24,6 @@ urlpatterns = [
     path('api/rest/', include([
         path('auth/', include('shallwe_auth.urls')),
         path('locations/', include('shallwe_locations.urls')),
+        path('facecheck/', include('shallwe_facecheck.urls')),
     ])),
 ]

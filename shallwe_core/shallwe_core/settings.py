@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'shallwe_auth',
     'shallwe_app',
     'shallwe_locations',
+    'shallwe_facecheck'
 ]
 
 MIDDLEWARE = [
