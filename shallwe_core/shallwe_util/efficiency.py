@@ -7,6 +7,6 @@ def time_measure(func):
         result = func(*args, **kwargs)
         end_time = time.time()  # End time
         execution_time = end_time - start_time  # Calculate execution time
-        print(f"%%%%%%%%%%%%%%%\nExecution Time: {execution_time} seconds\n%%%%%%%%%%%%%%%")
+        print(f"\n%%%%%%%%%%%%%%%\nExecution Time of {func.__module__}.{func.__name__}: {execution_time} seconds\n%%%%%%%%%%%%%%%\n")
         return result
     return timed_function_wrapper
