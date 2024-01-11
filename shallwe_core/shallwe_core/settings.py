@@ -200,3 +200,7 @@ TEMPLATES[0]['DIRS'] += [
 STATICFILES_DIRS += [
     BASE_DIR / FRONTEND_DIR / 'static',
 ]
+
+# For database schema
+if SHALLWE_BACKEND_MODE == 'DEV':
+    INSTALLED_APPS.append('django_extensions')
