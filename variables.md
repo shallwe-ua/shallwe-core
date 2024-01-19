@@ -1,5 +1,6 @@
 **./mock_frontend/shallwe/.env**\
 REACT_APP_REDIRECT_URI=`https://доменный.адрес.лендинга`
+
 ---
 **./shallwe_core/shallwe_core/build_config.py**\
 SHALLWE_CONF_SECRET_KEY=`"набор символов", получить у девелопера`\
