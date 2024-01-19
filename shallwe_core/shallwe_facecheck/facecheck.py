@@ -1,13 +1,10 @@
 import os
 from contextlib import redirect_stdout
 
-import environ
 from deepface import DeepFace
+from django.conf import settings
 
 from shallwe_util.efficiency import time_measure
-
-env = environ.Env()
-environ.Env.read_env()
 
 
 def check_face(image_path):
@@ -26,5 +23,5 @@ def check_face(image_path):
     return is_face_detected
 
 
-if env('SHALLWE_BACKEND_MODE') == 'DEV':
+if settings.SHALLWE_CONF_ENV_MODE == 'DEV':
     check_face = time_measure(check_face)

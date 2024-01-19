@@ -1,13 +1,9 @@
 from django.db.models import QuerySet
+from django.conf import settings
 
 from .models import Location
 
 from shallwe_util.efficiency import time_measure
-
-import environ
-
-env = environ.Env()
-environ.Env.read_env()
 
 
 class SearchResult:
@@ -59,5 +55,5 @@ def search(search_term: str) -> SearchResult:
     return result
 
 
-if env('SHALLWE_BACKEND_MODE') == 'DEV':
+if settings.SHALLWE_CONF_ENV_MODE == 'DEV':
     search = time_measure(search)

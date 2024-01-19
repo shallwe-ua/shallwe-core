@@ -1,12 +1,7 @@
+from django.conf import settings
 from django.urls import path
 
 from .views import LandingView, SetupView, SearchView, ContactsView, SettingsView
-
-import environ
-
-
-env = environ.Env()
-environ.Env.read_env()
 
 
 urlpatterns = [
@@ -17,7 +12,7 @@ urlpatterns = [
     path('settings/', SettingsView.as_view(), name='page-settings'),
 ]
 
-if env('SHALLWE_BACKEND_MODE') in ['DEV', 'QA']:
+if settings.SHALLWE_CONF_ENV_MODE == 'DEV':
     from .test_views import SampleAuthenticatedView, SampleGeneralView
     urlpatterns += [
         path('test-api-protected/', SampleAuthenticatedView.as_view(), name='test-api-protected'),

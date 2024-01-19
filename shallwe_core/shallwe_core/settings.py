@@ -10,12 +10,10 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
-import environ
 from pathlib import Path
 
-# Read the environment variables (.env file with secrets)
-env = environ.Env()
-environ.Env.read_env()
+# Import build-specific variables and secrets (DO NOT SHARE ON GITHUB)
+from .build_config import *
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,12 +23,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = env('SECRET_KEY')
+SECRET_KEY = SHALLWE_CONF_SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+
+ALLOWED_HOSTS = [*SHALLWE_CONF_ALLOWED_HOSTS]
+
+CSRF_TRUSTED_ORIGINS = [*SHALLWE_CONF_CSRF_TRUSTED_ORIGINS]
 
 
 # Application definition
@@ -102,12 +103,12 @@ WSGI_APPLICATION = 'shallwe_core.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': env('DB_ENGINE', default='django.db.backends.postgresql'),
-        'NAME': env('DB_NAME'),
-        'USER': env('DB_USER'),
-        'PASSWORD': env('DB_PASS'),
-        'HOST': env('DB_HOST', default='localhost'),
-        'PORT': env('DB_PORT', default='5432'),
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': SHALLWE_CONF_DB_NAME,
+        'USER': SHALLWE_CONF_DB_USER,
+        'PASSWORD': SHALLWE_CONF_DB_PASS,
+        'HOST': SHALLWE_CONF_DB_HOST or 'localhost',
+        'PORT': SHALLWE_CONF_DB_PORT or '5432',
     }
 }
 
@@ -180,8 +181,8 @@ SOCIALACCOUNT_PROVIDERS = {
            'access_type': 'online',
        },
        'APP': {
-           'client_id': env('OAUTH_CLIENT_ID'),
-           'secret': env('OAUTH_CLIENT_SECRET')
+           'client_id': SHALLWE_CONF_OAUTH_CLIENT_ID,
+           'secret': SHALLWE_CONF_OAUTH_CLIENT_SECRET
        }
    }
 }
@@ -192,14 +193,14 @@ DEFAULT_KATOTTG_CSV_PATH = BASE_DIR / 'shallwe_locations' / 'locations_src' / 'k
 
 
 # Mode-specific settings
-SHALLWE_BACKEND_MODE = env('SHALLWE_BACKEND_MODE')
-FRONTEND_DIR = 'mock_frontend' if SHALLWE_BACKEND_MODE in ['DEV', 'QA'] else 'frontend'
+SHALLWE_BACKEND_MODE = SHALLWE_CONF_ENV_MODE
+frontend_dir = 'mock_frontend' if SHALLWE_BACKEND_MODE in ['DEV', 'QA'] else 'frontend'
 
 TEMPLATES[0]['DIRS'] += [
-    BASE_DIR / FRONTEND_DIR,
+    BASE_DIR / frontend_dir,
 ]
 STATICFILES_DIRS += [
-    BASE_DIR / FRONTEND_DIR / 'static',
+    BASE_DIR / frontend_dir / 'static',
 ]
 
 # For database schema

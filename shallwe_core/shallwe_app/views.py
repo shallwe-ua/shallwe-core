@@ -9,7 +9,7 @@ class LoginRequiredMixinLandingPreset(LoginRequiredMixin):
 
 
 class ReactAppServingView(TemplateView):
-    template_name = 'frontend/index.html'
+    template_name = 'index.html'
 
 
 class GeneralLoginRequiredView(LoginRequiredMixinLandingPreset, ReactAppServingView):
