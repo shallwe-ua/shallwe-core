@@ -188,8 +188,15 @@ SOCIALACCOUNT_PROVIDERS = {
 }
 
 
-# Shallwe locations setting
+# Shallwe locations settings
 DEFAULT_KATOTTG_CSV_PATH = BASE_DIR / 'shallwe_locations' / 'locations_src' / 'katottg.csv'
+
+
+# Shallwe photo settings
+ALLOWED_PHOTO_FORMATS = ['jpeg', 'jpg', 'png', 'heic', 'heif']
+ALLOWED_PHOTO_MAX_SIZE = 20 * 1024 * 1024   # 20MB
+ALLOWED_PHOTO_MIN_DIMENSIONS = (200, 200)
+ALLOWED_PHOTO_MAX_DIMENSIONS = (8192, 8192)
 
 
 # Mode-specific settings
