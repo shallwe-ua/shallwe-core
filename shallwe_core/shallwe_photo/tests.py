@@ -11,7 +11,7 @@ class FaceDetectionViewTest(AuthorizedAPITestCase):
 
         if image_path:
             from django.contrib.staticfiles import finders
-            full_path = finders.find('shallwe_facecheck/img/' + image_path)
+            full_path = finders.find('shallwe_photo/img/' + image_path)
             with open(full_path, 'rb') as image_file:
                 response = self._get_response(url, method=method, data={'image': image_file})
         else:
