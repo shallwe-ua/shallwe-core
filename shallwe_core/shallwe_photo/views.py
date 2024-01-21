@@ -33,7 +33,7 @@ class FaceDetectionView(APIView):
             'error': ''
         }
         try:
-            result['image'] = formatcheck.PhotoValidator.clean_image(uploaded_image)
+            result['image'] = formatcheck.clean_image(uploaded_image)
             result['success'] = True
         except (formatcheck.InvalidImageFormatError, ValueError) as e:
             result['error'] = str(e)
