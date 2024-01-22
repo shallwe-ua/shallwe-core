@@ -109,6 +109,9 @@ DATABASES = {
         'PASSWORD': SHALLWE_CONF_DB_PASS,
         'HOST': SHALLWE_CONF_DB_HOST or 'localhost',
         'PORT': SHALLWE_CONF_DB_PORT or '5432',
+        'TEST': {
+            'NAME': SHALLWE_CONF_TEST_DB_NAME,
+        }
     }
 }
 
