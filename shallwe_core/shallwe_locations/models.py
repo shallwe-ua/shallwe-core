@@ -26,7 +26,7 @@ class Location(models.Model):
     search_name = models.CharField(max_length=32, null=False)
 
     # For city districts only
-    city = models.ForeignKey('self', on_delete=models.DO_NOTHING, null=True, db_column='city_autocode')
+    city = models.ForeignKey('self', on_delete=models.DO_NOTHING, null=True, db_column='city_autocode', related_name='districts')
 
     class Meta:
         ordering = [
