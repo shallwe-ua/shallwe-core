@@ -9,11 +9,17 @@ class LocationSearchView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        search_term = request.query_params.get('query', None)
+        search_terms_all = request.GET.getlist('query')
 
-        # Check if search_term is valid
-        if search_term is None:
-            return Response({'error': 'No search term provided'}, status=400)
+        # Check there only one search term
+        if len(search_terms_all) != 1:
+            return Response({'error': 'Exactly one search term should be provided'}, status=400)
+
+        search_term = search_terms_all[0]
+
+        # Check if search term is valid
+        if not search_term:
+            return Response({'error': 'Search term is empty'}, status=400)
         elif len(search_term) < 2 or len(search_term) > 32:
             return Response({'error': 'Search term length should be between 2 and 32 characters'}, status=400)
 
