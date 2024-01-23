@@ -1,9 +1,10 @@
+from django.core.files.uploadedfile import InMemoryUploadedFile
+
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-import tempfile
 
-from .facecheck import check_face
+from .facecheck import check_face_minified_temp
 from . import formatcheck
 
 
@@ -23,10 +24,10 @@ class FaceDetectionView(APIView):
             return Response({'error': clean_result['error']}, status=400)
 
         # Check face
-        is_face_detected = self._check_face_in_mini_temp(clean_result['image'])
+        is_face_detected = check_face_minified_temp(clean_result['image'])
         return Response({'success': is_face_detected})
 
-    def _try_clean_image(self, uploaded_image):
+    def _try_clean_image(self, uploaded_image: InMemoryUploadedFile):
         result = {
             'image': None,
             'success': False,
@@ -38,10 +39,3 @@ class FaceDetectionView(APIView):
         except (formatcheck.InvalidImageFormatError, ValueError) as e:
             result['error'] = str(e)
         return result
-
-    def _check_face_in_mini_temp(self, image):
-        minified_image = image.resize((200, 200))
-        with tempfile.NamedTemporaryFile(delete=True, suffix='.jpg') as temp_file:
-            minified_image.save(temp_file, format="JPEG")
-            is_face_detected = check_face(temp_file.name)
-        return is_face_detected

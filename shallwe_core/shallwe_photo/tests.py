@@ -39,6 +39,13 @@ class FaceDetectionViewTest(AuthorizedAPITestCase):
             self.assertIn('success', response.data)
             self.assertTrue(response.data['success'])
 
+    def test_face_detection_valid_rgba(self):
+        image_path = f'valid-format-rgba.png'
+        response = self._get_response_shortcut(image_path)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn('success', response.data)
+        self.assertTrue(response.data['success'])
+
     def test_face_detection_invalid_formats(self):
         # Test with various invalid image formats
         invalid_formats = ['bmp', 'gif', 'tiff']
