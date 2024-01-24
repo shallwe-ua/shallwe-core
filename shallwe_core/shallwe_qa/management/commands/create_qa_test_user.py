@@ -15,10 +15,7 @@ class Command(BaseCommand):
 
         # Create or get the user
         user, created = User.objects.get_or_create(username=username, email=email)
-        if not created:
-            self.stdout.write(self.style.SUCCESS(f'Test user "{user.username}" already exists'))
-            return
-        elif created:
+        if created:
             user.set_password(password)
             user.save()
 
