@@ -87,7 +87,7 @@ const Home = () => {
 
   const handleTestGeneralCall = async () => {
     try {
-      const response = await fetch('/test-api-unprotected/', {
+      const response = await fetch('/api/rest/auth/test-api-unprotected/', {
         method: 'GET',
       });
 
@@ -132,7 +132,7 @@ const Setup = () => {
         return;
       }
 
-      const response = await fetch('/test-api-protected/', {
+      const response = await fetch('/api/rest/auth/test-api-protected/', {
         method: 'GET',
         headers: {
           'Authorization': `Token ${token}`, // Set the Authorization header with the token

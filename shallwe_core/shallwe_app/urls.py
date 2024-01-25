@@ -1,4 +1,3 @@
-from django.conf import settings
 from django.urls import path
 
 from .views import LandingView, SetupView, SearchView, ContactsView, SettingsView
@@ -11,10 +10,3 @@ urlpatterns = [
     path('contacts/', ContactsView.as_view(), name='page-contacts'),
     path('settings/', SettingsView.as_view(), name='page-settings'),
 ]
-
-if settings.SHALLWE_CONF_ENV_MODE in ('DEV', 'QA'):
-    from .test_views import SampleAuthenticatedView, SampleGeneralView
-    urlpatterns += [
-        path('test-api-protected/', SampleAuthenticatedView.as_view(), name='test-api-protected'),
-        path('test-api-unprotected/', SampleGeneralView.as_view(), name='test-api-unprotected'),
-    ]
