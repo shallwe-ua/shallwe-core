@@ -4,4 +4,5 @@
 **/__pycache__/
 /shallwe_core/mock_frontend/
 /shallwe_core/staticfiles/
+/shallwe_core/media/
 /shallwe_core/shallwe_core/build_config.py

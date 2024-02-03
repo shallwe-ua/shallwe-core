@@ -96,6 +96,6 @@ class Location(models.Model):
             ),
         ]
 
-    @staticmethod
-    def get_all_country() -> 'Location':
-        return Location.objects.get(category='a')
+    @classmethod
+    def get_all_country(cls) -> 'Location':
+        return cls.objects.get(category='a')
