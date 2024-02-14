@@ -32,24 +32,24 @@ def search(search_term: str) -> SearchResult:
     regions = Location.objects.filter(
         search_name__istartswith=search_term,
         category='r'
-    ).values('autocode', 'region_name')
+    ).values('hierarchy', 'region_name')
 
     cities = Location.objects.filter(
         search_name__istartswith=search_term,
         category='c'
-    ).values('autocode', 'ppl_name', 'region_name')
+    ).values('hierarchy', 'ppl_name', 'region_name')
 
     other_ppls = Location.objects.filter(
         search_name__istartswith=search_term,
         category='p'
-    ).values('autocode', 'ppl_name', 'region_name', 'subregion_name')
+    ).values('hierarchy', 'ppl_name', 'region_name', 'subregion_name')
 
     # Retrieving related districts for each city
     for city in cities:
         city['districts'] = Location.objects.filter(
-            city_id=city['autocode'],
+            city__hierarchy=city['hierarchy'],
             category='d'
-        ).values('autocode', 'district_name')
+        ).values('hierarchy', 'district_name')
 
     result = SearchResult(regions, cities, other_ppls)
     return result
