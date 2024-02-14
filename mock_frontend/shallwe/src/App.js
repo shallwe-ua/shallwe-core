@@ -15,9 +15,11 @@ const PageWithBigText = ({ bgColor, pageTitle }) => (
 const LogoutButton = () => {
   const handleLogout = async () => {
     try {
+      const token = localStorage.getItem('shallweuaLoginKey');
       const response = await fetch('/api/rest/auth/logout/', {
         method: 'POST',
         headers: {
+          'Authorization': 'Token ' + token,
           'Content-Type': 'application/json',
         },
         // credentials: 'include', // Include credentials for the logout request
