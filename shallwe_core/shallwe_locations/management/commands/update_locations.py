@@ -14,7 +14,7 @@ class CapitalsProperValues:
             self.city_name = city_name
 
     KYIV = CapitalProperValues('Київська', 'Київ')
-    SEVASTOPOL = CapitalProperValues('Автономна Республіка Крим', 'Севастополь')
+    SEVASTOPOL = CapitalProperValues('АР Крим', 'Севастополь')
     HIERARCHY_TAIL = '99999999'
 
 
@@ -320,6 +320,13 @@ class Command(BaseCommand):
 
         # Copy to not mess up with original
         locations = deepcopy(locations)
+
+        # Shorten the name of the Crimea region
+        crimea_region = locations.search_by_name(
+            'Автономна Республіка Крим',
+            KATOTTGEntity.CategoryMapper.REGION.category
+        )[0].get_main_entity()
+        crimea_region.name = sevastopol_region_name
 
         # Process capitals
         for capital in locations.locations[KATOTTGEntity.CategoryMapper.CAPITAL.category].values():
