@@ -1,6 +1,5 @@
 from django.conf import settings
 from django.db import models, IntegrityError
-from django.db.models import QuerySet
 
 from shallwe_locations.models import Location
 from shallwe_util.efficiency import time_measure
