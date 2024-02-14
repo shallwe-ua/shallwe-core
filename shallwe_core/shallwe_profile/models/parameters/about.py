@@ -2,16 +2,17 @@
 #
 # from .choices import GenderChoices, SmokingLevelChoices, NeighbourlinessLevelChoices, GuestsLevelChoices, \
 #     PartiesLevelChoices, NeatnessLevelChoices, OccupationChoices, DrinkingLevelChoices, BedtimeLevelChoices
+# from .. import UserProfile
 #
 #
 # class UserProfileAbout(models.Model):
-#    user_profile = models.OneToOneField(
+#     user_profile = models.OneToOneField(
 #         UserProfile,
 #         on_delete=models.CASCADE,
 #         null=False,
 #         related_name='about'
 #     )
-
+#
 #     birth_date = models.DateField(null=False)
 #     gender = models.PositiveSmallIntegerField(null=False, choices=GenderChoices.choices)
 #     is_couple = models.BooleanField(null=False)
@@ -35,6 +36,8 @@
 #     neatness_level = models.PositiveSmallIntegerField(null=True, choices=NeatnessLevelChoices.choices)
 #
 #     # Animals
+#     # Todo: mayebe it should be many to many or foreign tables like with some checkbox values in neighbor prefs
+#     #  So then we could just simply check for intersection
 #     has_cats = models.BooleanField(null=False)
 #     has_dogs = models.BooleanField(null=False, default=False)
 #     has_reptiles = models.BooleanField(null=False, default=False)
