@@ -48,13 +48,13 @@ class NeighbourlinessLevelChoices(models.IntegerChoices):
 
 
 class GuestsLevelChoices(models.IntegerChoices):
-    NO_GUESTS = 1, 'no'
+    NEVER = 1, 'no'
     RARELY = 2, 'rarely'
     OFTEN = 3, 'often'
 
 
 class PartiesLevelChoices(models.IntegerChoices):
-    NO_GUESTS = 1, 'no'
+    NEVER = 1, 'no'
     RARELY = 2, 'rarely'
     OFTEN = 3, 'often'
 

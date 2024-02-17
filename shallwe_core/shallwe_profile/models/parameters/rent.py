@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.db import models, IntegrityError
 
 from shallwe_locations.models import Location
@@ -7,7 +8,7 @@ from .choices import RentDurationChoices, RoomSharingChoices
 from .. import UserProfile
 
 
-class OverlappingLocationsError(ValueError):
+class OverlappingLocationsError(ValidationError):
     pass
 
 
@@ -47,19 +48,20 @@ class UserProfileRentPreferences(models.Model):
 
     class Meta:
         constraints = [
+            # Budget
             models.CheckConstraint(
                 check=models.Q(min_budget__lte=models.F('max_budget')),
-                name='rent-prefs-profile-min-budget-lte-max-budget',
+                name='rent-prefs-min_budget-lte-max_budget',
                 violation_error_message='min_budget should be less than or equal to max_budget.'
             ),
             models.CheckConstraint(
                 check=models.Q(min_budget__gte=0) & models.Q(min_budget__lte=99999),
-                name='rent-prefs-min-budget-range',
+                name='rent-prefs-min_budget-range',
                 violation_error_message='min_budget should be within the range [0, 99999].'
             ),
             models.CheckConstraint(
                 check=models.Q(max_budget__gte=0) & models.Q(max_budget__lte=99999),
-                name='rent-prefs-max-budget-range',
+                name='rent-prefs-max_budget-range',
                 violation_error_message='max_budget should be within the range [0, 99999].'
             ),
         ]
@@ -68,6 +70,7 @@ class UserProfileRentPreferences(models.Model):
         super().save(*args, **kwargs)
         self._ensure_locations()
 
+    # Todo: ought to be refactored along with About related tags setters. same structure in general. DRY
     def set_locations(self, hierarchies: tuple[str, ...] = None):
         if self.pk:
             if hierarchies:
@@ -85,7 +88,7 @@ class UserProfileRentPreferences(models.Model):
             self._set_default_location()
 
     def _set_default_location(self):
-        self.locations.add(Location.get_all_country())
+        self.locations.set((Location.get_all_country(), ))
 
     def _check_no_overlapping_locations(self, hierarchies: tuple[str, ...]):
         for i, new_hierarchy in enumerate(hierarchies):

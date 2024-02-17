@@ -2,7 +2,7 @@ from pathlib import Path
 
 from django.contrib.auth.models import User
 from django.core.files.storage import default_storage
-from django.db import models, IntegrityError
+from django.db import models
 from imagekit.models import ImageSpecField, ProcessedImageField
 from imagekit.processors import ResizeToFill
 
@@ -45,13 +45,13 @@ class UserProfile(models.Model):
         constraints = [
             models.CheckConstraint(
                 check=models.Q(name__regex=r'^[а-яА-ЯёЁіІїЇєЄґҐ`]{2,16}$'),
-                name='user_profile_name_constraints',
+                name='user-profile-name-constraints',
                 violation_error_message='Name should be: Cyrillic characters only, no spaces, 2-16 characters'
             ),
         ]
 
     def save(self, *args, **kwargs):
-        # Todo: self._assert_linked_parameters()
+        # Todo: Ensure link related managers (How if they need the profile to be saved first?)
         self._set_old_photos_for_deletion_if_changed()
         super().save(*args, **kwargs)
 
@@ -59,17 +59,6 @@ class UserProfile(models.Model):
         # Store old photo paths for post-signal usage
         self._set_photo_paths_to_remove(self)
         super().delete(*args, **kwargs)
-
-    def _assert_linked_parameters(self):
-        # Ensure that related parameters are linked properly
-        unlinked_parameters = [
-            params_name
-            for params_name in ['about', 'rent_preferences', 'neighbor_preferences']
-            if not hasattr(self, params_name)
-        ]
-        if unlinked_parameters:
-            raise IntegrityError(f"Please link all related parameters before saving UserProfile instance, missing: "
-                                 f"{', '.join(unlinked_parameters)}.")
 
     def _set_old_photos_for_deletion_if_changed(self):
         # Store old photo paths for post-signal usage if changing the photo

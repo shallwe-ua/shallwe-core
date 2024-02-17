@@ -1,10 +1,17 @@
+from datetime import date
+
+from dateutil.relativedelta import relativedelta
+from django.core.exceptions import ValidationError
 from django.core.files.storage import default_storage
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.contrib.auth.models import User
 
 from shallwe_locations.models import Location
-from .models import UserProfile, UserProfileRentPreferences
+from .models import (UserProfile, UserProfileRentPreferences, UserProfileAbout, OtherAnimalsCountError,
+                     InterestsCountError, OtherAnimalTag, InterestTag, UserTooYoungError, UserTooOldError,
+                     UserProfileNeighborPreferences, SmokingLevelChoices, GuestsLevelChoices, PartiesLevelChoices,
+                     NeatnessLevelChoices, OccupationChoices, BedtimeLevelChoices, DrinkingLevelChoices)
 
 
 class UserProfileModelTest(TestCase):
@@ -93,7 +100,7 @@ class UserProfileModelTest(TestCase):
 
 
 class UserProfileRentPreferencesTestCase(TestCase):
-    fixtures = ['shallwe_locations/fixtures/locations_fixture.json']
+    fixtures = ['locations_mini_fixture.json']
 
     def setUp(self):
         self.profile = self.createProfile()
@@ -169,6 +176,228 @@ class UserProfileRentPreferencesTestCase(TestCase):
 
         self.assertEqual(len(locations), 2)
         self.assertEqual(locations[0].hierarchy, 'UA01')
+
+    def tearDown(self):
+        self.profile.delete()
+
+
+class UserProfileAboutTestCase(TestCase):
+    def setUp(self):
+        self.profile = self.createProfile()
+
+    def createProfile(self, username: str = 'testuser'):
+        from django.contrib.staticfiles import finders
+        user = User.objects.create_user(username=username, password='testpassword')
+        jpeg_file_path = finders.find('shallwe_profile/img/valid-format.jpg')
+
+        # Open the file, read binary data, and create a SimpleUploadedFile
+        with open(jpeg_file_path, 'rb') as jpg_file:
+            jpg_file_data = jpg_file.read()
+            initial_uploaded_file = SimpleUploadedFile("valid-format.jpg", jpg_file_data, content_type="image/jpeg")
+
+        # Create a UserProfile instance with an initial JPEG image
+        profile = UserProfile.objects.create(
+            user=user,
+            name='ТестЮзер',
+            photo_w768=initial_uploaded_file
+        )
+
+        return profile
+
+    def test_default_values_and_constraints(self):
+        about = UserProfileAbout(user_profile=self.profile, birth_date=date(2000, 1, 1), gender=1, is_couple=False, has_children=False)
+        about.save()  # should not raise ValidationError
+
+        # Test constraints
+        with self.assertRaises(UserTooYoungError):
+            about.birth_date = date.today() - relativedelta(years=15)
+            about.save()
+
+    def test_birth_date_validation(self):
+        # Test case 1: Birth date is too young
+        young_birth_date = date.today() - relativedelta(years=15)
+        about = UserProfileAbout(user_profile=self.profile, birth_date=young_birth_date, gender=1, is_couple=False,
+                                 has_children=False)
+        with self.assertRaises(UserTooYoungError):
+            about.save()
+
+        # Test case 2: Birth date is too old (first time saving the object)
+        old_birth_date = date.today() - relativedelta(years=121)
+        about.birth_date = old_birth_date
+        with self.assertRaises(UserTooOldError):
+            about.save()
+
+        # Test case 3: Birth date is within valid range
+        valid_birth_date = date.today() - relativedelta(years=20)
+        about.birth_date = valid_birth_date
+        try:
+            about.save()
+        except ValidationError:
+            self.fail("Valid birth date raised ValidationError unexpectedly")
+
+        # Test case 4: Birth date is too old (after first time saving the object)
+        old_birth_date = about.creation_date - relativedelta(years=121)
+        about.birth_date = old_birth_date
+        with self.assertRaises(UserTooOldError):
+            about.save()
+
+    def test_set_other_animals_tags(self):
+        about = UserProfileAbout.objects.create(user_profile=self.profile, birth_date=date(2000, 1, 1), gender=1, is_couple=False, has_children=False)
+        # Test setting other animals tags
+        tags = ('кіт', 'собака', 'миша')
+        about.set_other_animals_tags(tags)
+        self.assertEqual(about.other_animals_tags.count(), len(tags))
+
+        # Test setting more than 5 tags
+        with self.assertRaises(OtherAnimalsCountError):
+            about.set_other_animals_tags(('кіт', 'собака', 'миша', 'яструб', 'черепаха', 'тигр'))
+
+    def test_set_interests_tags(self):
+        about = UserProfileAbout.objects.create(user_profile=self.profile, birth_date=date(2000, 1, 1), gender=1, is_couple=False, has_children=False)
+        # Test setting interests tags
+        tags = ('кіно', 'прогулки', 'срачі')
+        about.set_interests_tags(tags)
+        self.assertEqual(about.interests_tags.count(), len(tags))
+
+        # Test setting more than 5 tags
+        with self.assertRaises(InterestsCountError):
+            about.set_interests_tags(('кіно', 'прогулки', 'срачі', 'порно', 'інтернет', 'двач'))
+
+    def test_duplicate_tags_creation(self):
+        # Create two UserProfileAbout instances with the same tag names
+        about1 = UserProfileAbout.objects.create(user_profile=self.createProfile('user1'), birth_date=date(2000, 1, 1), gender=1,
+                                                 is_couple=False, has_children=False)
+        about2 = UserProfileAbout.objects.create(user_profile=self.createProfile('user2'), birth_date=date(2000, 1, 1), gender=1,
+                                                 is_couple=False, has_children=False)
+        tags = ('кіт', 'собака', 'миша')
+        about1.set_other_animals_tags(tags)
+        about2.set_other_animals_tags(tags)
+
+        # Check that only one of each tag instance is created in the database
+        self.assertEqual(OtherAnimalTag.objects.count(), len(tags))
+
+        # Create another UserProfileAbout instance with the same tag names
+        about3 = UserProfileAbout.objects.create(user_profile=self.createProfile('user3'), birth_date=date(2000, 1, 1), gender=1,
+                                                 is_couple=False, has_children=False)
+        about3.set_other_animals_tags(tags)
+
+        # Check that only one of each tag instance is still created in the database
+        self.assertEqual(OtherAnimalTag.objects.count(), len(tags))
+
+        # Repeat the same process for interests tags
+        about4 = UserProfileAbout.objects.create(user_profile=self.createProfile('user4'), birth_date=date(2000, 1, 1), gender=1,
+                                                 is_couple=False, has_children=False)
+        about5 = UserProfileAbout.objects.create(user_profile=self.createProfile('user5'), birth_date=date(2000, 1, 1), gender=1,
+                                                 is_couple=False, has_children=False)
+        interests = ('кіно', 'прогулки', 'срачі')
+        about4.set_interests_tags(interests)
+        about5.set_interests_tags(interests)
+
+        # Check that only one of each tag instance is created in the database
+        self.assertEqual(InterestTag.objects.count(), len(interests))
+
+        about6 = UserProfileAbout.objects.create(user_profile=self.createProfile('user6'), birth_date=date(2000, 1, 1), gender=1,
+                                                 is_couple=False, has_children=False)
+        about6.set_interests_tags(interests)
+
+        # Check that only one of each tag instance is still created in the database
+        self.assertEqual(InterestTag.objects.count(), len(interests))
+
+        for about in about1, about2, about3, about4, about5, about6:
+            about.user_profile.delete()
+
+    def tearDown(self):
+        self.profile.delete()
+
+
+class UserProfileNeighborPreferencesTest(TestCase):
+    def setUp(self):
+        self.profile = self.createProfile()
+
+    def createProfile(self, username: str = 'testuser'):
+        from django.contrib.staticfiles import finders
+        user = User.objects.create_user(username=username, password='testpassword')
+        jpeg_file_path = finders.find('shallwe_profile/img/valid-format.jpg')
+
+        # Open the file, read binary data, and create a SimpleUploadedFile
+        with open(jpeg_file_path, 'rb') as jpg_file:
+            jpg_file_data = jpg_file.read()
+            initial_uploaded_file = SimpleUploadedFile("valid-format.jpg", jpg_file_data, content_type="image/jpeg")
+
+        # Create a UserProfile instance with an initial JPEG image
+        profile = UserProfile.objects.create(
+            user=user,
+            name='ТестЮзер',
+            photo_w768=initial_uploaded_file
+        )
+
+        return profile
+
+    def createNeighborPreferences(self, **kwargs) -> UserProfileNeighborPreferences:
+        defaults = {
+            'user_profile': self.profile,
+        }
+        defaults.update(kwargs)
+        return UserProfileNeighborPreferences.objects.create(**defaults)
+
+    def test_defaults_and_nulls(self):
+        neighbor_preferences = self.createNeighborPreferences()
+
+        self.assertEqual(neighbor_preferences.min_age_accepted, 16)
+        self.assertEqual(neighbor_preferences.max_age_accepted, 130)
+        self.assertEqual(neighbor_preferences.max_smoking_level_accepted, SmokingLevelChoices.EVERYWHERE)
+        self.assertTrue(neighbor_preferences.are_nonsmokers_accepted)
+        self.assertTrue(neighbor_preferences.are_cats_accepted)
+        self.assertTrue(neighbor_preferences.are_dogs_accepted)
+        self.assertTrue(neighbor_preferences.are_reptiles_accepted)
+        self.assertTrue(neighbor_preferences.are_birds_accepted)
+        self.assertTrue(neighbor_preferences.are_other_animals_accepted)
+        self.assertIsNone(neighbor_preferences.neighbourliness_level_accepted)
+        self.assertIsNone(neighbor_preferences.gender_accepted)
+        self.assertIsNone(neighbor_preferences.is_couple_accepted)
+        self.assertIsNone(neighbor_preferences.are_children_accepted)
+        self.assertIsNone(neighbor_preferences.neatness_level_accepted)
+        self.assertIsNone(neighbor_preferences.drinking_levels_accepted)
+        self.assertIsNone(neighbor_preferences.occupations_accepted)
+        self.assertIsNone(neighbor_preferences.bedtime_levels_accepted)
+        self.assertEqual(neighbor_preferences.max_guests_level_accepted, GuestsLevelChoices.OFTEN)
+        self.assertEqual(neighbor_preferences.max_parties_level_accepted, PartiesLevelChoices.OFTEN)
+
+    def test_user_profile_neighbor_preferences_creation(self):
+        try:
+            self.createNeighborPreferences(
+                min_age_accepted=20,
+                max_age_accepted=50,
+                max_smoking_level_accepted=SmokingLevelChoices.NO_SMOKING,
+                are_nonsmokers_accepted=True,
+                max_guests_level_accepted=GuestsLevelChoices.RARELY,
+                max_parties_level_accepted=PartiesLevelChoices.NEVER,
+                neatness_level_accepted=NeatnessLevelChoices.MODERATE,
+                are_cats_accepted=True,
+                are_dogs_accepted=False,
+                are_reptiles_accepted=True,
+                are_birds_accepted=False,
+                are_other_animals_accepted=True
+            )
+        except Exception as e:
+            self.fail(f"Valid values for neighbor prefs ended up in Error: {str(e)}")
+
+    def test_accepted_array_items_creation(self):
+        neighbor_prefs = self.createNeighborPreferences()
+
+        neighbor_prefs.set_accepted_occupations([OccupationChoices.STUDENT, OccupationChoices.OFFLINE])
+        self.assertEqual(len(neighbor_prefs.occupations_accepted), 2)
+
+        neighbor_prefs.set_accepted_bedtime_levels([BedtimeLevelChoices.LATE, BedtimeLevelChoices.MIDNIGHT])
+        self.assertEqual(len(neighbor_prefs.bedtime_levels_accepted), 2)
+
+        neighbor_prefs.set_accepted_drinking_levels([DrinkingLevelChoices.NO_DRINKING, DrinkingLevelChoices.ON_SPECIAL_OCCASIONS])
+        self.assertEqual(len(neighbor_prefs.drinking_levels_accepted), 2)
+
+        try:
+            neighbor_prefs.save()
+        except ValidationError:
+            self.fail('Got an error trying to save a valid neighbor preferences')
 
     def tearDown(self):
         self.profile.delete()

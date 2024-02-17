@@ -2,6 +2,6 @@ from .choices import RoomSharingChoices, RentDurationChoices, GenderChoices, Occ
     BedtimeLevelChoices, DrinkingLevelChoices, PartiesLevelChoices, SmokingLevelChoices, NeighbourlinessLevelChoices, \
     NeatnessLevelChoices
 from .rent import UserProfileRentPreferences, UserProfilePreferredLocations
-# from .about import UserProfileAbout
-# from .neighbor import UserProfileNeighborPreferences, UserProfileAcceptedOccupation, UserProfileAcceptedBedtimeLevel, \
-#     UserProfileAcceptedDrinkingLevel
+from .about import UserProfileAbout, InterestTag, OtherAnimalTag, InterestsCountError, OtherAnimalsCountError, \
+    UserTooYoungError, UserTooOldError
+from .neighbor import UserProfileNeighborPreferences, NotUniqueAcceptedItemsError

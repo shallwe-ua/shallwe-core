@@ -180,7 +180,7 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 
-# Django Allauth Settings
+# Allauth settings
 SITE_ID = 1
 ACCOUNT_EMAIL_VERIFICATION = 'none'
 SOCIALACCOUNT_PROVIDERS = {
@@ -199,6 +199,10 @@ SOCIALACCOUNT_PROVIDERS = {
 }
 
 
+# Taggit settings
+TAGGIT_CASE_INSENSITIVE = True
+
+
 # Shallwe locations settings
 DEFAULT_KATOTTG_CSV_PATH = BASE_DIR / 'shallwe_locations' / 'locations_src' / 'katottg.csv'
 
@@ -211,8 +215,8 @@ ALLOWED_PHOTO_MAX_DIMENSIONS = (8192, 8192)
 
 
 # Mode-specific settings
-SHALLWE_BACKEND_MODE = SHALLWE_CONF_ENV_MODE
-frontend_dir = 'mock_frontend' if SHALLWE_BACKEND_MODE in ['DEV', 'QA'] else 'frontend'
+# For proper frontend dir
+frontend_dir = 'mock_frontend' if SHALLWE_CONF_ENV_MODE in ['DEV', 'QA'] else 'frontend'
 
 TEMPLATES[0]['DIRS'] += [
     BASE_DIR / frontend_dir,
@@ -222,10 +226,9 @@ STATICFILES_DIRS += [
 ]
 
 # For database schema
-if SHALLWE_BACKEND_MODE == 'DEV':
+if SHALLWE_CONF_ENV_MODE == 'DEV':
     INSTALLED_APPS.append('django_extensions')
 
-
 # For QA test features
-if SHALLWE_BACKEND_MODE in ('DEV', 'QA', 'STAGE'):
+if SHALLWE_CONF_ENV_MODE in ('DEV', 'QA', 'STAGE'):
     INSTALLED_APPS.append('shallwe_qa')
