@@ -169,7 +169,7 @@ class UserProfileRentPreferencesTestCase(TestCase):
         # Retrieve the saved instance from the database
         saved_preferences = UserProfileRentPreferences.objects.get(pk=rent_preferences.pk)
 
-        locations_to_add = ('UA01', 'UA05')
+        locations_to_add = Location.objects.filter(hierarchy__in=('UA01', 'UA05'))
         saved_preferences.set_locations(locations_to_add)
 
         locations = saved_preferences.locations.all()

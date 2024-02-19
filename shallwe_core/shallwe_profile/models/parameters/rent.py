@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models, IntegrityError
+from django.db.models import QuerySet
 
 from shallwe_locations.models import Location
 from shallwe_util.efficiency import time_measure
@@ -71,12 +72,11 @@ class UserProfileRentPreferences(models.Model):
         self._ensure_locations()
 
     # Todo: ought to be refactored along with About related tags setters. same structure in general. DRY
-    def set_locations(self, hierarchies: tuple[str, ...] = None):
+    def set_locations(self, locations: Location | QuerySet[Location] = None):
         if self.pk:
-            if hierarchies:
-                if len(hierarchies) > 1:
-                    self._check_no_overlapping_locations(hierarchies)
-                locations = Location.objects.filter(hierarchy__in=hierarchies)
+            if locations:
+                if len(locations) > 1:
+                    self._check_no_overlapping_locations(locations)
                 self.locations.set(locations)
             else:
                 self._set_default_location()
@@ -90,13 +90,14 @@ class UserProfileRentPreferences(models.Model):
     def _set_default_location(self):
         self.locations.set((Location.get_all_country(), ))
 
-    def _check_no_overlapping_locations(self, hierarchies: tuple[str, ...]):
-        for i, new_hierarchy in enumerate(hierarchies):
-            for other_hierarchy in hierarchies[:i] + hierarchies[i+1:]:    # Excluding the current one
-                if new_hierarchy.startswith(other_hierarchy) or other_hierarchy.startswith(new_hierarchy):
+    def _check_no_overlapping_locations(self, locations: QuerySet[Location]):
+        for new_location in locations:
+            other_locations = locations.exclude(pk=new_location.pk)  # Excluding the one checked against
+            for other_new_location in other_locations:
+                if new_location.hierarchy.startswith(other_new_location.hierarchy) or other_new_location.hierarchy.startswith(new_location.hierarchy):
                     raise OverlappingLocationsError(f"Violation of hierarchical add logic:"
-                                                    f" {new_hierarchy}"
-                                                    f" overlaps with {other_hierarchy}")
+                                                    f" {new_location.search_name} {new_location.hierarchy}"
+                                                    f" overlaps with {other_new_location.search_name} {other_new_location.hierarchy}")
 
 
 class UserProfilePreferredLocations(models.Model):
