@@ -214,6 +214,10 @@ ALLOWED_PHOTO_MIN_DIMENSIONS = (200, 200)
 ALLOWED_PHOTO_MAX_DIMENSIONS = (8192, 8192)
 
 
+# Shallwe profile settings
+PROFILE_MAX_BUDGET = 99999
+
+
 # Mode-specific settings
 # For proper frontend dir
 frontend_dir = 'mock_frontend' if SHALLWE_CONF_ENV_MODE in ['DEV', 'QA'] else 'frontend'

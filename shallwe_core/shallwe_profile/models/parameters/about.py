@@ -114,6 +114,7 @@ class UserProfileAbout(models.Model):
 
     creation_date = models.DateField(null=False, auto_now_add=True)  # Reference point for max birth_date validation
 
+    # Todo: GeneratedField для возраста? (а будет ли он обновляться)
     birth_date = models.DateField(null=False)
     gender = models.PositiveSmallIntegerField(null=False, choices=GenderChoices.choices)
     is_couple = models.BooleanField(null=False)

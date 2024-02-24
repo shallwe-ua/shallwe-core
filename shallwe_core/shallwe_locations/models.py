@@ -3,6 +3,8 @@ from django.db.models import CheckConstraint, Q
 
 
 class Location(models.Model):
+    HIERARCHY_REGEX = r'^UA(?:\d{2}|\d{10}|\d{12})$'
+
     class CategoryChoices(models.TextChoices):
         WHOLE_COUNTRY = 'a', 'Whole country'
         REGION = 'r', 'Region'
