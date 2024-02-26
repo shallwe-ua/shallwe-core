@@ -116,12 +116,16 @@ class UserProfileRentPreferences(models.Model):
         ]
 
     def __init__(self, *args, **kwargs):
+        self._validate_init_values(kwargs)
+        super().__init__(*args, **kwargs)
+
+    def _validate_init_values(self, kwargs):
         provided_min_rent_duration = kwargs.get('min_rent_duration_level')
         provided_max_rent_duration = kwargs.get('max_rent_duration_level')
+
         if (any((provided_min_rent_duration, provided_max_rent_duration))
                 and not all((provided_min_rent_duration, provided_max_rent_duration))):
             raise ValidationError('Both rent_duration levels should be provided or neither')
-        super().__init__(*args, **kwargs)
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
