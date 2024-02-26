@@ -31,10 +31,6 @@ def validate_locations_no_overlap(locations: QuerySet[Location]):
                                                     f" {other_new_location.hierarchy}")
 
 
-class MinBudgetGTMaxBudgetError(ValidationError):
-    pass
-
-
 class UserProfileRentPreferences(models.Model):
     """**Caution:**\n
     Do NOT use locations manager to manage locations.\n
