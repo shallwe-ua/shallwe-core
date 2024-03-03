@@ -1,1 +1,2 @@
 from .rent import UserProfileRentPreferencesSerializer
+from .profile import UserProfileWithParametersSerializer

@@ -2,18 +2,13 @@ from django.db.models import QuerySet
 from rest_framework import serializers
 
 from shallwe_locations.models import Location
+from .common import non_required_char_list_field
 from ..models import UserProfileRentPreferences
 
 
 class UserProfileRentPreferencesSerializer(serializers.ModelSerializer):
     # Locations passed as hierarchies list
-    locations = serializers.ListField(
-        child=serializers.CharField(
-            allow_blank=False
-        ),
-        required=False,
-        allow_empty=True
-    )
+    locations = non_required_char_list_field()
 
     class Meta:
         model = UserProfileRentPreferences
