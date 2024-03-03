@@ -1,3 +1,5 @@
+from typing import Collection
+
 from django.contrib.postgres.fields import ArrayField
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -7,6 +9,9 @@ from .choices import GenderChoices, SmokingLevelChoices, NeighbourlinessLevelCho
 from .. import UserProfile
 
 
+# Todo: actually all this stuff probably belongs more to search than profile.
+#  I can imagine the product without search and this module - just browsing profiles (on the other hand, you then would
+#  like to know what's people's expectations by reading... But not here anyway) Think it through.
 class NotUniqueAcceptedItemsError(ValidationError):
     pass
 
@@ -109,26 +114,19 @@ class UserProfileNeighborPreferences(models.Model):
             )
         ]
 
-    def set_accepted_occupations(self, occupations: list[OccupationChoices] = None):
-        if occupations:
-            if len(set(occupations)) != len(occupations):
-                raise NotUniqueAcceptedItemsError('Occupations should not repeat')
-            self.occupations_accepted = occupations
+    def _set_list_values(self, field_name: str, values: Collection[models.IntegerChoices] = None):
+        if values:
+            if len(set(values)) != len(values):
+                raise NotUniqueAcceptedItemsError(f'{field_name} values should not repeat')
+            setattr(self, field_name, values)
         else:
-            self.occupations_accepted = []
+            setattr(self, field_name, [])
+
+    def set_accepted_occupations(self, occupations: list[OccupationChoices] = None):
+        self._set_list_values('occupations_accepted', occupations)
 
     def set_accepted_drinking_levels(self, drinking_levels: list[DrinkingLevelChoices] = None):
-        if drinking_levels:
-            if len(set(drinking_levels)) != len(drinking_levels):
-                raise NotUniqueAcceptedItemsError('Drinking levels should not repeat')
-            self.drinking_levels_accepted = drinking_levels
-        else:
-            self.drinking_levels_accepted = []
+        self._set_list_values('drinking_levels_accepted', drinking_levels)
 
     def set_accepted_bedtime_levels(self, bedtime_levels: list[BedtimeLevelChoices] = None):
-        if bedtime_levels:
-            if len(set(bedtime_levels)) != len(bedtime_levels):
-                raise NotUniqueAcceptedItemsError('Bedtime levels should not repeat')
-            self.bedtime_levels_accepted = bedtime_levels
-        else:
-            self.bedtime_levels_accepted = []
+        self._set_list_values('bedtime_levels_accepted', bedtime_levels)
