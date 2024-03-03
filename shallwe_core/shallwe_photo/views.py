@@ -18,6 +18,7 @@ class FaceDetectionView(APIView):
         if not uploaded_image:
             return Response({'error': 'No image provided'}, status=400)
 
+        # Todo: actually all this stuff could do a DRF serializer - refactor later
         # Check format
         clean_result = self._try_clean_image(uploaded_image)
         if not clean_result['success']:
@@ -36,6 +37,6 @@ class FaceDetectionView(APIView):
         try:
             result['image'] = formatcheck.clean_image(uploaded_image)
             result['success'] = True
-        except (formatcheck.InvalidImageFormatError, ValueError) as e:
+        except (formatcheck.ImageValidationError, ValueError) as e:
             result['error'] = str(e)
         return result

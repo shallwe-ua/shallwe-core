@@ -50,7 +50,7 @@ def validate_image_format(uploaded_image: InMemoryUploadedFile):
         )
 
 
-def validate_image_dimensions(image: Image):
+def validate_image_dimensions(image: Image.Image):
     min_dimensions = settings.ALLOWED_PHOTO_MIN_DIMENSIONS
     max_dimensions = settings.ALLOWED_PHOTO_MAX_DIMENSIONS
     if image.size[0] < min_dimensions[0] or image.size[1] < min_dimensions[1]:
@@ -63,12 +63,12 @@ def validate_image_dimensions(image: Image):
         )
 
 
-def validate_image_square(image: Image):
+def validate_image_square(image: Image.Image):
     if image.size[0] != image.size[1]:
         raise ImageNotSquareError("Image must be a square")
 
 
-def clean_image(uploaded_image):
+def clean_image(uploaded_image, return_opened=True):
 
     validate_is_image(uploaded_image)
     validate_image_size(uploaded_image)
@@ -79,4 +79,4 @@ def clean_image(uploaded_image):
     validate_image_dimensions(image)
     validate_image_square(image)
 
-    return image
+    return image if return_opened else uploaded_image
