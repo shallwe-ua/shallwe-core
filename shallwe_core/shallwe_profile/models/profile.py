@@ -1,5 +1,6 @@
 from pathlib import Path
 
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.files.storage import default_storage
 from django.db import models
@@ -8,7 +9,7 @@ from imagekit.processors import ResizeToFill
 
 
 class UserProfile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, null=False)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, null=False, related_name='profile')
     is_hidden = models.BooleanField(null=False, default=False)
     name = models.CharField(null=False)
 
@@ -44,7 +45,7 @@ class UserProfile(models.Model):
     class Meta:
         constraints = [
             models.CheckConstraint(
-                check=models.Q(name__regex=r'^[а-яА-ЯёЁіІїЇєЄґҐ`]{2,16}$'),
+                check=models.Q(name__regex=settings.PROFILE_NAME_REGEX),
                 name='user-profile-name-constraints',
                 violation_error_message='Name should be: Cyrillic characters only, no spaces, 2-16 characters'
             ),
