@@ -1,6 +1,8 @@
 from datetime import date
+from typing import Collection
 
 from dateutil.relativedelta import relativedelta
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models, IntegrityError
 from taggit.managers import TaggableManager
@@ -9,6 +11,10 @@ from taggit.models import TagBase, TaggedItemBase
 from .choices import GenderChoices, SmokingLevelChoices, NeighbourlinessLevelChoices, GuestsLevelChoices, \
     PartiesLevelChoices, NeatnessLevelChoices, OccupationChoices, DrinkingLevelChoices, BedtimeLevelChoices
 from .. import UserProfile
+
+
+PROFILE_OTHER_ANIMAL_REGEX = settings.PROFILE_OTHER_ANIMAL_REGEX
+PROFILE_INTEREST_REGEX = settings.PROFILE_INTEREST_REGEX
 
 
 # Todo: lots of almost exactly duplicating code for interests and other animals tags. Refactor later. DRY.
@@ -25,7 +31,7 @@ class OtherAnimalTag(TagBase):
         verbose_name_plural = "Other Animal Tags"
         constraints = [
             models.CheckConstraint(
-                check=models.Q(name__regex=r'^[а-яА-ЯёЁіІїЇєЄґҐ`\-]{2,32}$'),
+                check=models.Q(name__regex=PROFILE_OTHER_ANIMAL_REGEX),
                 name='profile-about-other-animal-tag-name-constraint',
                 violation_error_message='Other animal tag name must be only Cyrillic chars and hyphens, 2-32 chars'
             )
@@ -66,7 +72,7 @@ class InterestTag(TagBase):
         verbose_name_plural = "Interest Tags"
         constraints = [
             models.CheckConstraint(
-                check=models.Q(name__regex=r'^[а-яА-ЯёЁіІїЇєЄґҐ`\-\s]{2,32}$'),
+                check=models.Q(name__regex=PROFILE_INTEREST_REGEX),
                 name='profile-about-interest-tag-name-constraint',
                 violation_error_message='Interest tag name must be only Cyrillic chars, hyphens and spaces, 2-32 chars'
             )
@@ -94,12 +100,16 @@ class InterestsCountError(ValidationError):
     pass
 
 
-# Birthdate validation errors
-class UserTooYoungError(ValidationError):
+# Birthdate validation
+class UserAgeValidationError(ValidationError):
     pass
 
 
-class UserTooOldError(ValidationError):
+class UserTooYoungError(UserAgeValidationError):
+    pass
+
+
+class UserTooOldError(UserAgeValidationError):
     pass
 
 
@@ -178,28 +188,32 @@ class UserProfileAbout(models.Model):
         self._check_birth_date_valid()
         super().save(*args, **kwargs)
 
-    # Todo: definitely should make it reusable - already 3 times usage for this king of setter
-    def set_other_animals_tags(self, tags: tuple[str, ...] = None):
+    # Todo: unify with similar logic in Rent (setting locations)
+    def _set_tags(self, field_name: str, amount_err_class: type, tags: Collection[str] = None):
+        tags_manager = getattr(self, field_name)
         if self.pk:
             if tags:
                 if len(tags) > 5:
-                    raise OtherAnimalsCountError("Cannot add more than 5 other animals tags to UserProfileAbout")
-                self.other_animals_tags.set(tags)
+                    raise amount_err_class(f'The maximum amount of {field_name} items is 5')
+                tags_manager.set(tags)
             else:
-                self.other_animals_tags.clear()
+                tags_manager.clear()
         else:
-            raise IntegrityError('Should save UserProfileAbout before setting related other animal tags')
+            raise IntegrityError(f'Should save UserProfileAbout before setting related {field_name} items')
 
-    def set_interests_tags(self, tags: tuple[str, ...] = None):
-        if self.pk:
-            if tags:
-                if len(tags) > 5:
-                    raise InterestsCountError("Cannot add more than 5 interest tags to UserProfileAbout")
-                self.interests_tags.set(tags)
-            else:
-                self.interests_tags.clear()
-        else:
-            raise IntegrityError('Should save UserProfileAbout before setting related interest tags')
+    def set_other_animals_tags(self, tags: Collection[str] = None):
+        self._set_tags(
+            'other_animals_tags',
+            OtherAnimalsCountError,
+            tags
+        )
+
+    def set_interests_tags(self, tags: Collection[str] = None):
+        self._set_tags(
+            'interests_tags',
+            InterestsCountError,
+            tags
+        )
 
     def _check_birth_date_valid(self):
         min_birth_date = date.today() - relativedelta(years=16)
