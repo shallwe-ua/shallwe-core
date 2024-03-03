@@ -216,6 +216,9 @@ ALLOWED_PHOTO_MAX_DIMENSIONS = (8192, 8192)
 
 # Shallwe profile settings
 PROFILE_MAX_BUDGET = 99999
+PROFILE_NAME_REGEX = r'^[а-яА-ЯёЁіІїЇєЄґҐ`]{2,16}$'
+PROFILE_OTHER_ANIMAL_REGEX = r'^[а-яА-ЯёЁіІїЇєЄґҐ`\-]{2,32}$'
+PROFILE_INTEREST_REGEX = r'^[а-яА-ЯёЁіІїЇєЄґҐ`\-\s]{2,32}$'
 
 
 # Mode-specific settings
