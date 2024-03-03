@@ -365,8 +365,8 @@ class UserProfileNeighborPreferencesTest(TestCase):
         defaults = {
             'user_profile': self.profile,
         }
-        defaults.update(kwargs)
-        return UserProfileNeighborPreferences.objects.create(**defaults)
+        kwargs.update(defaults)
+        return UserProfileNeighborPreferences.objects.create(**kwargs)
 
     def test_defaults_and_nulls(self):
         neighbor_preferences = self.createNeighborPreferences()
