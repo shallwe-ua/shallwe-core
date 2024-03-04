@@ -6,7 +6,6 @@ from rest_framework.test import APIClient
 
 
 class AuthorizedAPITestCase(TestCase):
-
     @classmethod
     def setUpTestData(cls):
         cls.user = get_user_model().objects.create_user(
@@ -20,14 +19,16 @@ class AuthorizedAPITestCase(TestCase):
         client.credentials(HTTP_AUTHORIZATION=f'Token {self.token.key}')
         return client
 
-    def _get_response(self, url, method='get', data=None, query_params=None):
+    def _get_response(self, url, method='get', data=None, query_params=None, _format=None):
         url_reversed = reverse(url)
         client = self._get_authenticated_client()
 
         if method == 'get':
             response = client.get(url_reversed, data=query_params)
+        elif method == 'post':
+            response = client.post(url_reversed, data=data, format=_format)
         else:
-            response = client.post(url_reversed, data=data)
+            response = None
 
         client.credentials()  # Reset credentials
 
