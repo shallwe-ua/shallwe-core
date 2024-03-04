@@ -27,5 +27,6 @@ urlpatterns = [
         path('auth/', include('shallwe_auth.urls')),
         path('locations/', include('shallwe_locations.urls')),
         path('photo/', include('shallwe_photo.urls')),
+        path('profile/', include('shallwe_profile.urls'))
     ])),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
