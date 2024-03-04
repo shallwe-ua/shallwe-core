@@ -15,8 +15,11 @@ Deprecated==1.2.14
 dj-rest-auth==5.0.2
 Django==5.0.1
 django-allauth==0.58.2
+django-appconf==1.0.6
 django-environ==0.11.2
 django-extensions==3.2.3
+django-imagekit==5.0.0
+django-taggit==5.0.1
 djangorestframework==3.14.0
 docopt==0.6.2
 filelock==3.13.1
@@ -47,6 +50,7 @@ opt-einsum==3.3.0
 packaging==23.2
 pandas==2.1.4
 pi-heif==0.14.0
+pilkit==3.0
 pillow==10.2.0
 pipreqs==0.4.13
 protobuf==4.23.4
