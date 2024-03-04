@@ -1,4 +1,5 @@
 import re
+from collections import OrderedDict
 
 from rest_framework import serializers
 
@@ -86,6 +87,34 @@ class UserProfileWithParametersSerializer:
         )
 
         self.validation_result = None
+
+    def _get_nested_attr_values(self, attr: str) -> dict:
+        result = {}
+
+        for parameter_group in ('profile', 'rent_preferences', 'about'):
+            serializer = getattr(self, parameter_group + '_serializer')
+            serializer_attr = getattr(serializer, attr)
+
+            if serializer_attr:
+                result[parameter_group] = serializer_attr
+
+        return result
+
+    @property
+    def data(self):
+        return self._get_nested_attr_values('data')
+
+    @property
+    def errors(self):
+        return self._get_nested_attr_values('errors')
+
+    def get_fields(self):
+        fields = OrderedDict({
+            'profile': self.profile_serializer.get_fields(),
+            'rent_preferences': self.rent_preferences_serializer.get_fields(),
+            'about': self.about_serializer.get_fields()
+        })
+        return fields
 
     def is_valid(self) -> ProfileValidationResult:
         validation_result = self.ProfileValidationResult(
