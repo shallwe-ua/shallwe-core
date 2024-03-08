@@ -30,7 +30,7 @@ class UserProfileTestCase(TestCase):
         # Create a UserProfile instance with a sample image
         profile = UserProfile(
             user=self.user,
-            name='ТестЮзер',
+            name="Мар'ян`ко",
             photo_w768=jpeg_uploaded_file
         )
         # profile.about, profile.rent_preferences, profile.neighbor_preferences = ['mock'] * 3    # Passing related rule
@@ -39,7 +39,7 @@ class UserProfileTestCase(TestCase):
         # Assert that the UserProfile instance was created successfully
         self.assertIsInstance(profile, UserProfile)
         self.assertEqual(profile.user, self.user)
-        self.assertEqual(profile.name, 'ТестЮзер')
+        self.assertEqual(profile.name, "Мар'ян`ко")
 
         # Check if dynamically generated images are created
         self.assertTrue(profile.photo_w540.url)
