@@ -40,6 +40,9 @@ class UserProfileRentPreferencesSerializer(serializers.ModelSerializer):
                                                           f" overlaps with"
                                                           f" {other_new_location}")
 
+        if (loc_len := len(location_hierarchies)) > 30:
+            raise serializers.ValidationError(f'Too many locations: {loc_len}. The maximum is 30')
+
         locations = Location.objects.filter(hierarchy__in=location_hierarchies)
 
         check_all_exist(locations)

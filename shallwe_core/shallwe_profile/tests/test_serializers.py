@@ -139,6 +139,11 @@ class UserProfileRentPreferencesSerializerTestCase(TestCase):
             'max_budget': 2000,
             'locations': ['UA02']
         }
+        data_too_many_locations = {
+            'min_budget': 1000,
+            'max_budget': 2000,
+            'locations': [f'UA{i:02d}' for i in range(1, 32)]
+        }
         self._assert_data_set_all_invalid([
             data_budget_min_gt_max,
             data_budget_too_big,
@@ -146,7 +151,8 @@ class UserProfileRentPreferencesSerializerTestCase(TestCase):
             data_rent_duration_not_both_provided,
             data_rent_duration_min_gt_max,
             data_locations_overlap,
-            data_locations_nonexistent
+            data_locations_nonexistent,
+            data_too_many_locations
         ])
 
 

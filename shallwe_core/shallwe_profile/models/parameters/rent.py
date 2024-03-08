@@ -13,6 +13,10 @@ from .. import UserProfile
 PROFILE_MAX_BUDGET = settings.PROFILE_MAX_BUDGET
 
 
+class LocationsCountError(ValidationError):
+    pass
+
+
 class OverlappingLocationsError(ValidationError):
     pass
 
@@ -131,6 +135,8 @@ class UserProfileRentPreferences(models.Model):
     def set_locations(self, locations: QuerySet[Location] = None):
         if self.pk:
             if locations:
+                if locations.count() > 30:
+                    raise LocationsCountError('You can set up to 30 locations')
                 validate_locations_no_overlap(locations)
                 self.locations.set(locations)
             else:
