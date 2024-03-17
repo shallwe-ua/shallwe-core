@@ -69,6 +69,8 @@ const Home = () => {
 
           if (response.ok) {
             // Reload the page
+            let responseBody = await response.json();
+            console.log(responseBody);
             window.location.reload(true); // Force a reload from the server
           } else {
             console.error('POST request failed:', response.status);
@@ -102,7 +104,7 @@ const Home = () => {
   };
 
   const redirectURI = process.env.REACT_APP_REDIRECT_URI;
-  const googleAuthUri = `https://accounts.google.com/o/oauth2/v2/auth?redirect_uri=${redirectURI}&prompt=consent&response_type=code&client_id=143026764447-q4v3tsd826qj26jlnrivofl24m1vhpjm.apps.googleusercontent.com&scope=openid&access_type=online`
+  const googleAuthUri = `https://accounts.google.com/o/oauth2/v2/auth?redirect_uri=${redirectURI}&prompt=consent&response_type=code&client_id=143026764447-q4v3tsd826qj26jlnrivofl24m1vhpjm.apps.googleusercontent.com&scope=openid&access_type=offline`
   
   return (
     <div>
@@ -124,12 +126,6 @@ const Setup = () => {
   // Function to handle the test-auth API request
   const handleTestAuthCall = async () => {
     try {
-      const token = localStorage.getItem('shallweuaLoginKey'); // Retrieve token from localStorage
-      if (!token) {
-        console.error('No token found in localStorage');
-        return;
-      }
-
       const response = await fetch('/api/rest/auth/test-api-protected/', {
         method: 'GET',
       });

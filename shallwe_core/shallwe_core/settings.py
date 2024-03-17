@@ -181,7 +181,7 @@ SOCIALACCOUNT_PROVIDERS = {
            'openid',  # Only include 'openid' scope for retrieving Google Account ID
        ],
        'AUTH_PARAMS': {
-           'access_type': 'online',
+           'access_type': 'offline',
        },
        'APP': {
            'client_id': SHALLWE_CONF_OAUTH_CLIENT_ID,
