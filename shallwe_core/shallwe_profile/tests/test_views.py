@@ -43,6 +43,18 @@ class ProfileAPIViewTest(AuthorizedAPITestCase):
         self.assertEqual(response.status_code, 201)
         self.assertEqual(len(UserProfile.objects.filter(user=self.user)), 1)
 
+    def test_valid_profile_creation_tags_as_strs(self):
+        with patch('shallwe_photo.formatcheck.clean_image', lambda x: x), \
+             patch('shallwe_photo.facecheck.check_face_minified_temp', lambda x: True):
+
+            data_tags_as_strs = self.valid_data_min | {
+                'rent_preferences[locations]': 'UA01',
+                'about[other_animals]': 'кіт',
+                'about[interests]': 'біг'
+            }
+            response = self._get_response_shortcut(data_tags_as_strs)
+            self.assertEqual(response.status_code, 201)
+
     def test_invalid_data_response(self):
         with patch('shallwe_photo.formatcheck.clean_image', lambda x: None), \
              patch('shallwe_photo.facecheck.check_face_minified_temp', lambda x: True):
@@ -54,7 +66,6 @@ class ProfileAPIViewTest(AuthorizedAPITestCase):
             response1 = self._get_response_shortcut(invalid_data_wrong_value)
             self.assertEqual(response1.status_code, 400)
             self.assertIn('name', response1.data.get('error').get('profile'))
-            print(response1.data)
 
             # Wrong attribute
             invalid_data_wrong_attribute = self.valid_data_min | {
@@ -63,4 +74,3 @@ class ProfileAPIViewTest(AuthorizedAPITestCase):
             response2 = self._get_response_shortcut(invalid_data_wrong_attribute)
             self.assertEqual(response2.status_code, 400)
             self.assertIn('profile[hello]', response2.data.get('error'))
-            print(response2.data)
