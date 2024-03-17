@@ -97,6 +97,20 @@ class UserProfileRentPreferencesSerializerTestCase(TestCase):
         passed_locations = list(Location.objects.filter(hierarchy__in=data['locations']))
         self.assertListEqual(saved_locations, passed_locations)
 
+    def test_rent_preferences_valid_values_creation_min_budget_zero(self):
+        data = {
+            'min_budget': 0,
+            'max_budget': 2000,
+            'min_rent_duration_level': 1,
+            'max_rent_duration_level': 2,
+            'room_sharing_level': 1,
+            'locations': ['UA01', 'UA05']
+        }
+
+        # Validate
+        serializer = UserProfileRentPreferencesSerializer(data=data)
+        self.assertTrue(serializer.is_valid())
+
     def _assert_data_invalid(self, data: dict):
         serializer = UserProfileRentPreferencesSerializer(data=data)
         self.assertFalse(serializer.is_valid())    # Expect validation to fail

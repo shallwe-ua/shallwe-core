@@ -1,5 +1,6 @@
 from django.db.models import QuerySet
 from rest_framework import serializers
+from rest_framework.fields import empty
 
 from shallwe_locations.models import Location
 from .common import non_required_char_list_field
@@ -57,7 +58,7 @@ class UserProfileRentPreferencesSerializer(serializers.ModelSerializer):
             # Add min/max to a list values if not None
             for prefix in ('min_', 'max_'):
                 attr_value = attrs.get(prefix + field_group_name)
-                if attr_value:
+                if isinstance(attr_value, int):
                     field_group_values.append(attr_value)
 
             # Check whether both min/max or neither provided

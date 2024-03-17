@@ -159,6 +159,17 @@ class UserProfileRentPreferencesTestCase(TestCase):
         # Check if the related UserProfile is set correctly
         self.assertEqual(saved_preferences.user_profile, self.profile)
 
+    def test_create_default_instance_min_budget_zero(self):
+        # Create a UserProfileRentPreferences instance with default values
+        rent_preferences = UserProfileRentPreferences(
+            user_profile=self.profile,
+            min_budget=0,
+            max_budget=5000
+        )
+
+        # Save the instance to the database
+        rent_preferences.save()
+
     def test_invalid_values_creation(self):
         with self.assertRaises(ValidationError):
             rent_preferences = UserProfileRentPreferences(

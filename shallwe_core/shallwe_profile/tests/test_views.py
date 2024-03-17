@@ -55,6 +55,16 @@ class ProfileAPIViewTest(AuthorizedAPITestCase):
             response = self._get_response_shortcut(data_tags_as_strs)
             self.assertEqual(response.status_code, 201)
 
+    def test_valid_profile_creation_min_budget_zero(self):
+        with patch('shallwe_photo.formatcheck.clean_image', lambda x: x), \
+                patch('shallwe_photo.facecheck.check_face_minified_temp', lambda x: True):
+
+            data_min_budget_zero = self.valid_data_min | {
+                'rent_preferences[min_budget]': 0,
+            }
+            response = self._get_response_shortcut(data_min_budget_zero)
+            self.assertEqual(response.status_code, 201)
+
     def test_invalid_data_response(self):
         with patch('shallwe_photo.formatcheck.clean_image', lambda x: None), \
              patch('shallwe_photo.facecheck.check_face_minified_temp', lambda x: True):
