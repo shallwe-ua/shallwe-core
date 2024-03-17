@@ -1,8 +1,6 @@
 from django.contrib.auth import get_user_model
-from django.test import TestCase
+from django.test import TestCase, Client
 from django.urls import reverse
-from rest_framework.authtoken.models import Token
-from rest_framework.test import APIClient
 
 
 class AuthorizedAPITestCase(TestCase):
@@ -12,11 +10,12 @@ class AuthorizedAPITestCase(TestCase):
             username='testuser',
             password='testpassword'
         )
-        cls.token = Token.objects.create(user=cls.user)
 
     def _get_authenticated_client(self):
-        client = APIClient()
-        client.credentials(HTTP_AUTHORIZATION=f'Token {self.token.key}')
+        client = Client()
+        client.login(username='testuser', password='testpassword')
+        csrftoken_cookie = client.cookies.get('csrftoken', '')
+        client.defaults['HTTP_X_CSRFTOKEN'] = csrftoken_cookie
         return client
 
     def _get_response(self, url, method='get', data=None, query_params=None, _format=None):
@@ -30,6 +29,6 @@ class AuthorizedAPITestCase(TestCase):
         else:
             response = None
 
-        client.credentials()  # Reset credentials
+        client.logout()
 
         return response
