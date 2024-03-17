@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect
 from django.views.generic import TemplateView
@@ -17,26 +18,43 @@ class GeneralLoginRequiredView(LoginRequiredMixinLandingPreset, ReactAppServingV
 
 
 class LandingView(ReactAppServingView):
-
     def dispatch(self, request, *args, **kwargs):
-        if self.request.user.is_authenticated:
-            # Redirect authenticated users to another page
-            return redirect('page-setup')
+        if request.user.is_authenticated:
+            if hasattr(request.user, 'profile'):
+                return redirect('page-search')
+            else:
+                return redirect('page-setup')
         else:
             return super().dispatch(request, *args, **kwargs)
 
 
 class SetupView(GeneralLoginRequiredView):
-    pass
+    def dispatch(self, request, *args, **kwargs):
+        if hasattr(request.user, 'profile'):
+            return redirect('page-settings')
+        else:
+            return super().dispatch(request, *args, **kwargs)
 
 
 class SearchView(GeneralLoginRequiredView):
-    pass
+    def dispatch(self, request, *args, **kwargs):
+        if not hasattr(request.user, 'profile'):
+            return redirect('page-setup')
+        else:
+            return super().dispatch(request, *args, **kwargs)
 
 
 class ContactsView(GeneralLoginRequiredView):
-    pass
+    def dispatch(self, request, *args, **kwargs):
+        if not hasattr(request.user, 'profile'):
+            return redirect('page-setup')
+        else:
+            return super().dispatch(request, *args, **kwargs)
 
 
 class SettingsView(GeneralLoginRequiredView):
-    pass
+    def dispatch(self, request, *args, **kwargs):
+        if not hasattr(request.user, 'profile'):
+            return redirect('page-setup')
+        else:
+            return super().dispatch(request, *args, **kwargs)
