@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import Cookies from 'js-cookie';
 
 // Define the font size variable
 const fontSize = '2em';
@@ -15,11 +16,13 @@ const PageWithBigText = ({ bgColor, pageTitle }) => (
 const LogoutButton = () => {
   const handleLogout = async () => {
     try {
-      const token = localStorage.getItem('shallweuaLoginKey');
+      // Get CSRF token from cookies using js-cookie
+      const csrfToken = Cookies.get('csrftoken');
+
       const response = await fetch('/api/rest/auth/logout/', {
         method: 'POST',
         headers: {
-          'Authorization': 'Token ' + token,
+          'X-CSRFToken': csrfToken,
           'Content-Type': 'application/json',
         },
         // credentials: 'include', // Include credentials for the logout request
@@ -65,13 +68,6 @@ const Home = () => {
           });
 
           if (response.ok) {
-            // Get the response data, assuming it returns JSON with a 'key'
-            const responseData = await response.json();
-            const loginKey = responseData.key;
-
-            // Save the key to localStorage
-            localStorage.setItem('shallweuaLoginKey', loginKey);
-
             // Reload the page
             window.location.reload(true); // Force a reload from the server
           } else {
@@ -136,9 +132,6 @@ const Setup = () => {
 
       const response = await fetch('/api/rest/auth/test-api-protected/', {
         method: 'GET',
-        headers: {
-          'Authorization': `Token ${token}`, // Set the Authorization header with the token
-        },
       });
 
       if (response.ok) {

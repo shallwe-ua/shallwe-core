@@ -1,7 +1,6 @@
 from django.conf import settings
 from django.urls import path
-from .views import GoogleLoginView
-from dj_rest_auth.views import LogoutView
+from .views import GoogleLoginView, LogoutView
 
 
 urlpatterns = [
