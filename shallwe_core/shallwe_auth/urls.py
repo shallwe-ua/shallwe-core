@@ -1,11 +1,12 @@
 from django.conf import settings
 from django.urls import path
-from .views import GoogleLoginView, LogoutView
+from .views import GoogleLoginView, LogoutView, DeleteUserView
 
 
 urlpatterns = [
     path('login/google/', GoogleLoginView.as_view(), name='google-auth'),
-    path('logout/', LogoutView.as_view(), name='logout')
+    path('logout/', LogoutView.as_view(), name='logout'),
+    path('user/', DeleteUserView.as_view(), name='delete-user')
 ]
 
 

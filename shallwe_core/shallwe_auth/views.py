@@ -4,6 +4,8 @@ from dj_rest_auth.registration.views import SocialLoginView
 from dj_rest_auth.views import LogoutView as RestAuthLogoutView
 from django.conf import settings
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 
 class GoogleLoginView(SocialLoginView):
@@ -14,3 +16,11 @@ class GoogleLoginView(SocialLoginView):
 
 class LogoutView(RestAuthLogoutView):
     permission_classes = [IsAuthenticated]
+
+
+class DeleteUserView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request):
+        request.user.delete()
+        return Response('Auth data deleted successfully', 204)

@@ -227,7 +227,3 @@ STATICFILES_DIRS += [
 # For database schema
 if SHALLWE_CONF_ENV_MODE == 'DEV':
     INSTALLED_APPS.append('django_extensions')
-
-# For QA test features
-if SHALLWE_CONF_ENV_MODE in ('DEV', 'QA', 'STAGE'):
-    INSTALLED_APPS.append('shallwe_qa')

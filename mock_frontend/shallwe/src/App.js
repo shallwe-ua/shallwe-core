@@ -141,13 +141,36 @@ const Setup = () => {
       console.error('An error occurred during the request:', error);
     }
   };
+  
+  const deleteAccountCall = async() => {
+
+    const csrfToken = Cookies.get('csrftoken');
+        
+    try {
+      const response = await fetch('/api/rest/auth/user/', {
+        method: 'DELETE',
+        headers: {
+          'X-CSRFToken': csrfToken,
+        }
+      })
+
+      if (response.ok) {
+        const responseData = await response.json()
+        console.log(responseData)
+      } else {
+        console.error('Delete request failed:', response.status);
+      }
+    } catch (error) {
+      console.error('An error occurred during the request:', error);
+    }
+  };
 
   return (
     <div>
       <PageWithBigText bgColor="#7FFFD4" pageTitle="Setup" />
       <LogoutButton />
-      {/* Button to trigger the test-auth API request */}
       <button onClick={handleTestAuthCall}>Test Token Protected API (see console)</button>
+      <button onClick={deleteAccountCall}>Delete account</button>
     </div>
   );
 };
