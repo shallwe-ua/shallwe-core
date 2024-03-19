@@ -29,7 +29,7 @@ class ProfileAPIViewTest(AuthorizedAPITestCase):
             pass
 
     def _get_response_shortcut(self, data: dict):
-        url = 'profile-create'
+        url = 'profile-me'
         method = 'post'
         response = self._get_response(url, method=method, data=data, _format='multipart')
         return response
