@@ -126,16 +126,16 @@ class UserProfileWithParametersSerializer:
 
         return result
 
-    def _get_serializer(self, parameter_group_name: str) -> ModelSerializer:
+    def _get_serializer(self, attr_group_name: str) -> ModelSerializer:
         try:
-            serializer = getattr(self, parameter_group_name + '_serializer')
+            serializer = getattr(self, attr_group_name + '_serializer')
             return serializer
         except AttributeError as err:
             if self.partial:
                 pass
             else:
                 raise AttributeError(
-                    f'No {parameter_group_name} serializer was found, but partial=False.'
+                    f'No {attr_group_name} serializer was found, but partial=False.'
                     f' All serializers should`ve been created in this case.'
                 ) from err
 
