@@ -1,5 +1,7 @@
 from unittest.mock import patch
 
+from django.core.files.uploadedfile import SimpleUploadedFile
+
 from shallwe_profile.models import UserProfile
 from shallwe_util.tests import AuthorizedAPITestCase
 
@@ -84,3 +86,54 @@ class ProfileAPIViewTest(AuthorizedAPITestCase):
             response2 = self._get_response_shortcut(invalid_data_wrong_attribute)
             self.assertEqual(response2.status_code, 400)
             self.assertIn('profile[hello]', response2.data.get('error'))
+
+
+class ProfileVisibilityViewTestCase(AuthorizedAPITestCase):
+    def setUp(self):
+        self.profile = self.createProfile()
+
+    def createProfile(self):
+        from django.contrib.staticfiles import finders
+        jpeg_file_path = finders.find('shallwe_profile/img/valid-format.jpg')
+
+        # Open the file, read binary data, and create a SimpleUploadedFile
+        with open(jpeg_file_path, 'rb') as jpg_file:
+            jpg_file_data = jpg_file.read()
+            initial_uploaded_file = SimpleUploadedFile("valid-format.jpg", jpg_file_data, content_type="image/jpeg")
+
+        # Create a UserProfile instance with an initial JPEG image
+        profile = UserProfile.objects.create(
+            user=self.user,
+            name='ТестЮзер',
+            photo_w768=initial_uploaded_file
+        )
+
+        return profile
+
+    def tearDown(self):
+        try:
+            self.user.profile.delete()
+        except:
+            pass
+
+    def _get_response_shortcut(self, data):
+        response = self._get_response('profile-visibility', method='patch', data=data, content_type='application/json')
+        return response
+
+    def test_profile_visibility_view_valid(self):
+        response = self._get_response_shortcut(data={'is_hidden': True})
+        self.assertEqual(response.status_code, 200)
+
+    def test_profile_visibility_view_invalid(self):
+        for data, expected_code in (
+            ({}, 400),
+            ({'hello': 123}, 400),
+            ({'is_hidden': None}, 400)
+        ):
+            response = self._get_response_shortcut(data=data)
+            self.assertEqual(response.status_code, expected_code)
+
+    def test_profile_visibility_change_no_profile_conflict(self):
+        self.profile.delete()
+        response = self._get_response_shortcut(data={'is_hidden': True})
+        self.assertEqual(response.status_code, 409)

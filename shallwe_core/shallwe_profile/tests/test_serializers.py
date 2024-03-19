@@ -8,7 +8,7 @@ from django.test import TestCase
 
 from shallwe_locations.models import Location
 from ..models import UserProfile, UserProfileRentPreferences, UserProfileAbout
-from ..serializers import UserProfileRentPreferencesSerializer
+from ..serializers import UserProfileRentPreferencesSerializer, UserProfileVisibilitySerializer
 from ..serializers.about import UserProfileAboutSerializer
 from ..serializers.profile import UserProfileWithParametersSerializer, NotValidatedDataSavingError
 
@@ -405,3 +405,53 @@ class UserProfileSerializerTestCase(TestCase):
 
     def tearDown(self):
         UserProfile.objects.filter(user=self.user).delete()
+
+
+class UserProfileVisibilitySerializerTestCase(TestCase):
+    def setUp(self):
+        self.profile = self.createProfile()
+
+    def createProfile(self):
+        from django.contrib.staticfiles import finders
+        user = User.objects.create_user(username='testuser', password='testpassword')
+        jpeg_file_path = finders.find('shallwe_profile/img/valid-format.jpg')
+
+        # Open the file, read binary data, and create a SimpleUploadedFile
+        with open(jpeg_file_path, 'rb') as jpg_file:
+            jpg_file_data = jpg_file.read()
+            initial_uploaded_file = SimpleUploadedFile("valid-format.jpg", jpg_file_data, content_type="image/jpeg")
+
+        # Create a UserProfile instance with an initial JPEG image
+        profile = UserProfile.objects.create(
+            user=user,
+            name='ТестЮзер',
+            photo_w768=initial_uploaded_file
+        )
+
+        return profile
+
+    def tearDown(self):
+        self.profile.delete()
+
+    def test_profile_visibility_serializer_valid(self):
+        data = {
+            'is_hidden': True,
+        }
+
+        serializer = UserProfileVisibilitySerializer(self.profile, data=data)
+        self.assertTrue(serializer.is_valid())
+
+        instance = serializer.save()
+        self.assertEqual(instance, self.profile)
+        self.assertEqual(instance.is_hidden, data['is_hidden'])
+
+    def test_profile_visibility_serializer_empty_value(self):
+        data_no_key = {}
+        serializer_no_key = UserProfileVisibilitySerializer(self.profile, data=data_no_key)
+        self.assertFalse(serializer_no_key.is_valid())
+
+        data_no_value = {
+            'is_hidden': None
+        }
+        serializer_no_value = UserProfileVisibilitySerializer(self.profile, data=data_no_value)
+        self.assertFalse(serializer_no_value.is_valid())

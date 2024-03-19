@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.test import TestCase, Client
+from django.test.client import MULTIPART_CONTENT
 from django.urls import reverse
 
 
@@ -18,16 +19,15 @@ class AuthorizedAPITestCase(TestCase):
         client.defaults['HTTP_X_CSRFTOKEN'] = csrftoken_cookie
         return client
 
-    def _get_response(self, url, method='get', data=None, query_params=None, _format=None):
+    def _get_response(self, url, method='get', data=None, query_params=None, content_type=MULTIPART_CONTENT, _format=None):
         url_reversed = reverse(url)
         client = self._get_authenticated_client()
 
         if method == 'get':
             response = client.get(url_reversed, data=query_params)
-        elif method == 'post':
-            response = client.post(url_reversed, data=data, format=_format)
         else:
-            response = None
+            client_http_method = getattr(client, method)
+            response = client_http_method(url_reversed, data=data, content_type=content_type, format=_format)
 
         client.logout()
 
