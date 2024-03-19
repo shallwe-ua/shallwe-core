@@ -2,6 +2,7 @@ import re
 from collections import OrderedDict
 
 from rest_framework import serializers
+from rest_framework.serializers import ModelSerializer
 
 from shallwe_core.settings import PROFILE_NAME_REGEX
 from shallwe_photo import formatcheck, facecheck
@@ -50,15 +51,25 @@ class NotValidatedDataSavingError(Exception):
 class UserProfileWithParametersSerializer:
     """
     For the reason I can't quite understand DRF serializers are not equipped to handle writable nested
-    serializers if those have nested creation logic themselves.\n\n
+    serializers if those have nested creation logic themselves.\n
+
     So, in order to do all the stuff we need with all nested parameters we are forced to use multiple serializers
     separately. This class is basically an interface for handling multiple serializers, so we don't do that in views.\n
+
     Just pass the data from request and kwargs as dict like {'profile': ..., 'rent_preferences': ..., etc...}
-    if there are any.
+    if there are any.\n
     """
 
+    profile_serializer: UserProfileBaseSerializer
+    rent_preferences_serializer: UserProfileRentPreferencesSerializer
+    about_serializer: UserProfileAboutSerializer
+
     class ProfileValidationResult:
-        def __init__(self, is_profile_valid: bool, is_rent_prefs_valid: bool, is_about_valid: bool):
+        def __init__(self,
+                     is_profile_valid: bool = None,
+                     is_rent_prefs_valid: bool = None,
+                     is_about_valid: bool = None
+                     ):
             self.is_profile_valid = is_profile_valid
             self.is_rent_prefs_valid = is_rent_prefs_valid
             self.is_about_valid = is_about_valid
@@ -68,23 +79,36 @@ class UserProfileWithParametersSerializer:
 
         @property
         def is_all_valid(self):
-            return all((self.is_profile_valid, self.is_rent_prefs_valid, self.is_about_valid))
+            return all((
+                getattr(self, f'is_{attr_group}_valid') in (True, None)
+                for attr_group in ('profile', 'rent_prefs', 'about')
+            ))
 
-    def __init__(self, data: dict, kwargs: dict = None):
+    def __init__(self, data: dict, kwargs: dict = None, instance: UserProfile = None, partial=False):
         kwargs = {} if not kwargs else kwargs
 
-        self.profile_serializer = UserProfileBaseSerializer(
-            data=data.get('profile'),
-            **kwargs.get('profile', {})
-        )
-        self.rent_preferences_serializer = UserProfileRentPreferencesSerializer(
-            data=data.get('rent_preferences'),
-            **kwargs.get('rent_preferences', {})
-        )
-        self.about_serializer = UserProfileAboutSerializer(
-            data=data.get('about'),
-            **kwargs.get('about', {})
-        )
+        self.instance = instance
+        self.partial = partial
+
+        for serializer_class, attr_group_name in (
+            (UserProfileBaseSerializer, 'profile'),
+            (UserProfileRentPreferencesSerializer, 'rent_preferences'),
+            (UserProfileAboutSerializer, 'about')
+        ):
+            kwargs[attr_group_name] = kwargs.get(attr_group_name, {}) | {'partial': partial}
+
+            attr_group_instance = None
+            if instance:
+                attr_group_instance = instance if attr_group_name == 'profile' else getattr(instance, attr_group_name)
+
+            attr_group_data = data.get(attr_group_name)
+            if attr_group_data or not partial:
+                serializer = serializer_class(
+                    instance=attr_group_instance,
+                    data=data.get(attr_group_name),
+                    **kwargs.get(attr_group_name)
+                )
+                setattr(self, f'{attr_group_name}_serializer', serializer)
 
         self.validation_result = None
 
@@ -92,13 +116,28 @@ class UserProfileWithParametersSerializer:
         result = {}
 
         for parameter_group in ('profile', 'rent_preferences', 'about'):
-            serializer = getattr(self, parameter_group + '_serializer')
-            serializer_attr = getattr(serializer, attr)
+            serializer = self._get_serializer(parameter_group)
 
-            if serializer_attr:
-                result[parameter_group] = serializer_attr
+            if serializer:
+                serializer_attr = getattr(serializer, attr)
+
+                if serializer_attr:
+                    result[parameter_group] = serializer_attr
 
         return result
+
+    def _get_serializer(self, parameter_group_name: str) -> ModelSerializer:
+        try:
+            serializer = getattr(self, parameter_group_name + '_serializer')
+            return serializer
+        except AttributeError as err:
+            if self.partial:
+                pass
+            else:
+                raise AttributeError(
+                    f'No {parameter_group_name} serializer was found, but partial=False.'
+                    f' All serializers should`ve been created in this case.'
+                ) from err
 
     @property
     def data(self):
@@ -109,20 +148,25 @@ class UserProfileWithParametersSerializer:
         return self._get_nested_attr_values('errors')
 
     def get_fields(self):
-        fields = OrderedDict({
-            'profile': self.profile_serializer.get_fields(),
-            'rent_preferences': self.rent_preferences_serializer.get_fields(),
-            'about': self.about_serializer.get_fields()
-        })
-        return fields
+        fields = {}
+        for attr_group_name in ('profile', 'rent_preferences', 'about'):
+            if serializer := self._get_serializer(attr_group_name):
+                fields |= {attr_group_name: serializer.get_fields()}
+        fields_ordered = OrderedDict(fields)
+
+        return fields_ordered
 
     def is_valid(self) -> ProfileValidationResult:
-        validation_result = self.ProfileValidationResult(
-            self.profile_serializer.is_valid(),
-            self.rent_preferences_serializer.is_valid(),
-            self.about_serializer.is_valid()
-        )
+        validation_result_data = {}
 
+        if profile_serializer := self._get_serializer('profile'):
+            validation_result_data |= {'is_profile_valid': profile_serializer.is_valid()}
+        if about_serializer := self._get_serializer('about'):
+            validation_result_data |= {'is_about_valid': about_serializer.is_valid()}
+        if rent_prefs_serializer := self._get_serializer('rent_preferences'):
+            validation_result_data |= {'is_rent_prefs_valid': rent_prefs_serializer.is_valid()}
+
+        validation_result = self.ProfileValidationResult(**validation_result_data)
         self.validation_result = validation_result
 
         return validation_result
@@ -131,16 +175,19 @@ class UserProfileWithParametersSerializer:
         kwargs = {} if not kwargs else kwargs
 
         if self.validation_result:
-            profile = self.profile_serializer.save(**kwargs.get('profile', {}))
+            if profile_serializer := self._get_serializer('profile'):
+                profile = profile_serializer.save(**kwargs.get('profile', {}))
+                profile_arg = {'user_profile': profile} if not self.instance else {}
+            else:
+                profile = self.instance
+                profile_arg = {}
 
-            self.rent_preferences_serializer.save(
-                user_profile=profile,
-                **kwargs.get('rent_preferences', {})
-            )
-            self.about_serializer.save(
-                user_profile=profile,
-                **kwargs.get('about', {})
-            )
+            for attr_group_name in ('about', 'rent_preferences'):
+                if serializer := self._get_serializer(attr_group_name):
+                    serializer.save(
+                        **profile_arg,
+                        **kwargs.get(attr_group_name, {})
+                    )
 
             return profile
         else:

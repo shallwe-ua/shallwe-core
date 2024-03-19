@@ -1,3 +1,5 @@
+import datetime
+from typing import Any
 from unittest.mock import patch
 
 from PIL import Image
@@ -10,7 +12,8 @@ from shallwe_locations.models import Location
 from ..models import UserProfile, UserProfileRentPreferences, UserProfileAbout
 from ..serializers import UserProfileRentPreferencesSerializer, UserProfileVisibilitySerializer
 from ..serializers.about import UserProfileAboutSerializer
-from ..serializers.profile import UserProfileWithParametersSerializer, NotValidatedDataSavingError
+from ..serializers.profile import UserProfileWithParametersSerializer, NotValidatedDataSavingError, \
+    UserProfileBaseSerializer
 
 
 class UserProfileRentPreferencesSerializerTestCase(TestCase):
@@ -113,7 +116,7 @@ class UserProfileRentPreferencesSerializerTestCase(TestCase):
 
     def _assert_data_invalid(self, data: dict):
         serializer = UserProfileRentPreferencesSerializer(data=data)
-        self.assertFalse(serializer.is_valid())    # Expect validation to fail
+        self.assertFalse(serializer.is_valid())  # Expect validation to fail
 
     def _assert_data_set_all_invalid(self, data_set: list[dict]):
         for data in data_set:
@@ -276,7 +279,7 @@ class UserProfileAboutSerializerTestCase(TestCase):
         _test_with_invalids(invalid_data_wrong_regex_tags)
 
 
-class UserProfileSerializerTestCase(TestCase):
+class UserProfileWithParametersSerializerCreateTestCase(TestCase):
     fixtures = ['locations_mini_fixture.json']
 
     def setUp(self):
@@ -343,7 +346,7 @@ class UserProfileSerializerTestCase(TestCase):
         }
 
         with patch('shallwe_photo.formatcheck.clean_image', self.mock_clean_image), \
-             patch('shallwe_photo.facecheck.check_face_minified_temp', self.mock_check_face):
+                patch('shallwe_photo.facecheck.check_face_minified_temp', self.mock_check_face):
             invalid_name_serializer = UserProfileWithParametersSerializer(data=invalid_name_data)
             self.assertFalse(invalid_name_serializer.is_valid(), 'Invalid name should not pass validation')
 
@@ -375,7 +378,7 @@ class UserProfileSerializerTestCase(TestCase):
         }
 
         with patch('shallwe_photo.formatcheck.clean_image', self.mock_clean_image), \
-             patch('shallwe_photo.facecheck.check_face_minified_temp', self.mock_check_face):
+                patch('shallwe_photo.facecheck.check_face_minified_temp', self.mock_check_face):
             invalid_rent_prefs_serializer = UserProfileWithParametersSerializer(data=invalid_rent_prefs_data)
             self.assertFalse(invalid_rent_prefs_serializer.is_valid(),
                              'Invalid rent preferences should not pass validation')
@@ -394,7 +397,7 @@ class UserProfileSerializerTestCase(TestCase):
             'about': self.valid_about | {'birth_date': '1900-02-02'}
         }
         with patch('shallwe_photo.formatcheck.clean_image', self.mock_clean_image), \
-             patch('shallwe_photo.facecheck.check_face_minified_temp', self.mock_check_face):
+                patch('shallwe_photo.facecheck.check_face_minified_temp', self.mock_check_face):
             invalid_about_serializer = UserProfileWithParametersSerializer(data=invalid_about_data)
             self.assertFalse(invalid_about_serializer.is_valid(),
                              'Invalid about should not pass validation')
@@ -404,7 +407,199 @@ class UserProfileSerializerTestCase(TestCase):
             invalid_rent_prefs_serializer.save()
 
     def tearDown(self):
-        UserProfile.objects.filter(user=self.user).delete()
+        for profile in UserProfile.objects.filter(user=self.user):
+            profile.delete()
+
+
+class UserProfileWithParametersSerializerUpdateTestCase(TestCase):
+    fixtures = ['locations_mini_fixture.json']
+
+    def setUp(self):
+        self.profile = self.createProfile()
+
+        # Lambda functions for mocked methods. Usage "with patch("original.method.path", new=self.mock_method)"
+        self.mock_clean_image = lambda x: Image.open(self.valid_photo)
+        self.mock_check_face = lambda x: True
+
+    def getPhoto(self, filename: str = 'valid-format.jpg') -> SimpleUploadedFile:
+        from django.contrib.staticfiles import finders
+        jpeg_file_path = finders.find(f'shallwe_profile/img/{filename}')
+
+        # Open the file, read binary data, and create a SimpleUploadedFile
+        with open(jpeg_file_path, 'rb') as jpg_file:
+            jpg_file_data = jpg_file.read()
+            initial_uploaded_file = SimpleUploadedFile(filename, jpg_file_data, content_type="image/jpeg")
+
+        return initial_uploaded_file
+
+    def createProfile(self):
+        user = User.objects.create_user(username='testuser', password='testpassword')
+
+        # Create a UserProfile instance with an initial JPEG image
+        profile = UserProfile.objects.create(
+            user=user,
+            name='ТестЮзер',
+            photo_w768=self.getPhoto()
+        )
+        about = UserProfileAbout.objects.create(user_profile=profile, **{
+            'birth_date': datetime.date.fromisoformat('1960-02-02'),
+            'gender': 1,
+            'is_couple': True,
+            'has_children': False
+        })
+        about.set_interests_tags(['гулять'])
+
+        UserProfileRentPreferences.objects.create(user_profile=profile, **{
+            'min_budget': 1000,
+            'max_budget': 2000
+        })
+
+        return profile
+
+    def tearDown(self):
+        self.profile.delete()
+
+    def test_profile_update_valid(self):
+        def check(data):
+            serializer = UserProfileWithParametersSerializer(instance=self.profile, data=data, partial=True)
+            self.assertTrue(serializer.is_valid().is_all_valid)
+            serializer.save()
+
+        def get_profile():
+            return UserProfile.objects.get(pk=self.profile.pk)
+
+        data1 = {
+            'profile': {
+                'name': 'Ульяночка'
+            }
+        }
+        check(data1)
+        self.assertEqual(get_profile().name, 'Ульяночка')
+
+        data2 = {
+            'profile': {
+                'photo': self.getPhoto('valid-format-copy.jpg')
+            }
+        }
+        check(data2)
+        self.assertIn(
+            'valid-format-copy',
+            get_profile().photo_w768.name.split('.')[0]
+        )
+
+        data3 = {
+            'about': {
+                'gender': 2
+            }
+        }
+        check(data3)
+        self.assertEqual(get_profile().about.gender, 2)
+
+        data4 = {
+            'about': {
+                'smoking_level': 1
+            }
+        }
+        check(data4)
+        self.assertEqual(get_profile().about.smoking_level, 1)
+
+        data5 = {
+            'about': {
+                'smoking_level': 3,
+                'smokes_cigs': True
+            }
+        }
+        check(data5)
+        self.assertEqual(get_profile().about.smoking_level, 3)
+        self.assertTrue(get_profile().about.smokes_cigs)
+
+        data6a = {
+            'about': {
+                'interests': ['плавання', 'дрочка']
+            }
+        }
+        check(data6a)
+        self.assertSetEqual(
+            set(tag.name for tag in get_profile().about.interests_tags.all()),
+            {'плавання', 'дрочка'}
+        )
+
+        data6b = {
+            'about': {
+                'interests': ['ааа', 'бааа']
+            }
+        }
+        check(data6b)
+        self.assertSetEqual(
+            set(tag.name for tag in get_profile().about.interests_tags.all()),
+            {'ааа', 'бааа'}
+        )
+
+        data7 = {
+            'rent_preferences': {
+                'min_budget': 2000,
+                'max_budget': 3000
+            }
+        }
+        check(data7)
+        self.assertEqual(get_profile().rent_preferences.min_budget, 2000)
+        self.assertEqual(get_profile().rent_preferences.max_budget, 3000)
+
+        data8a = {
+            'rent_preferences': {
+                'locations': ['UA01']
+            }
+        }
+        check(data8a)
+        self.assertSetEqual(
+            set(loc.hierarchy for loc in get_profile().rent_preferences.locations.all()),
+            {'UA01'}
+        )
+
+        data8b = {
+            'rent_preferences': {
+                'locations': ['UA05']
+            }
+        }
+        check(data8b)
+        self.assertSetEqual(
+            set(loc.hierarchy for loc in get_profile().rent_preferences.locations.all()),
+            {'UA05'}
+        )
+
+    def test_profile_update_invalid(self):
+        def check(data):
+            serializer = UserProfileWithParametersSerializer(instance=self.profile, data=data, partial=True)
+            self.assertFalse(serializer.is_valid().is_all_valid)
+            return serializer
+
+        data_invalid_budget = {
+            'rent_preferences': {
+                'min_budget': 500
+            }
+        }
+        check(data_invalid_budget)
+
+        data_invalid_rent_duration = {
+            'rent_preferences': {
+                'min_rent_duration_level': 1
+            }
+        }
+        check(data_invalid_rent_duration)
+
+        data_invalid_locations = {
+            'rent_preferences': {
+                'locations': ['UA', 'UA01']
+            }
+        }
+        check(data_invalid_locations)
+
+        data_invalid_interests_tags = {
+            'about': {
+                'interests': ['fdsfsd', '45342']
+            }
+        }
+        check(data_invalid_interests_tags)
 
 
 class UserProfileVisibilitySerializerTestCase(TestCase):

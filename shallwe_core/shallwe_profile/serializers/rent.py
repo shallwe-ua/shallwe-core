@@ -78,8 +78,14 @@ class UserProfileRentPreferencesSerializer(serializers.ModelSerializer):
 
         return attrs
 
-    def create(self, validated_data):
+    def create_or_update_instance(self, instance, validated_data):
         locations_data = validated_data.pop('locations', [])
-        rent_preferences = super().create(validated_data)
+        rent_preferences = super().update(instance, validated_data) if instance else super().create(validated_data)
         rent_preferences.set_locations(locations_data)
         return rent_preferences
+
+    def update(self, instance, validated_data):
+        return self.create_or_update_instance(instance, validated_data)
+
+    def create(self, validated_data):
+        return self.create_or_update_instance(None, validated_data)

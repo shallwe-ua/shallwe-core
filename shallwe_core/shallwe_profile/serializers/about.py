@@ -117,13 +117,19 @@ class UserProfileAboutSerializer(serializers.ModelSerializer):
 
         return attrs
 
-    def create(self, validated_data):
+    def update_or_create_instance(self, instance, validated_data):
         other_animals_tags_data = validated_data.pop('other_animals', [])
         interests_tags_data = validated_data.pop('interests', [])
 
-        instance = super().create(validated_data)
+        instance = super().update(instance, validated_data) if instance else super().create(validated_data)
 
         instance.set_other_animals_tags(other_animals_tags_data)
         instance.set_interests_tags(interests_tags_data)
 
         return instance
+
+    def update(self, instance, validated_data):
+        return self.update_or_create_instance(instance, validated_data)
+
+    def create(self, validated_data):
+        return self.update_or_create_instance(None, validated_data)
