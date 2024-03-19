@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from shallwe_util.views import MultiPartWithNestedToJSONParser, validate_received_data_structure, UnexpectedFieldError
-from .serializers import UserProfileWithParametersSerializer
+from .serializers import UserProfileWithParametersSerializer, UserProfileVisibilitySerializer
 
 
 class ProfileAPIView(APIView):
@@ -31,7 +31,7 @@ class ProfileAPIView(APIView):
 
         return data_copy
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request):
         if hasattr(request.user, 'profile'):
             return Response({'error': 'This user already has a profile'}, status=status.HTTP_409_CONFLICT)
 
@@ -41,10 +41,27 @@ class ProfileAPIView(APIView):
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
         clean_data = self._clean_list_values(request.data)
-        serializer = self.serializer_post(data=clean_data, *args, **kwargs)
+        serializer = self.serializer_post(data=clean_data)
 
         if serializer.is_valid():
             serializer.save(kwargs={'profile': {'user': request.user}})
             return Response(status=status.HTTP_201_CREATED)
+        else:
+            return Response({'error': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ProfileVisibilityAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+    serializer_patch = UserProfileVisibilitySerializer
+
+    def patch(self, request):
+        if not hasattr(request.user, 'profile'):
+            return Response({'error': 'This user has no profile to operate with'}, status=status.HTTP_409_CONFLICT)
+
+        serializer = self.serializer_patch(instance=request.user.profile, data=request.data)
+
+        if serializer.is_valid():
+            serializer.save(kwargs={'profile': {'user': request.user}})
+            return Response(status=status.HTTP_200_OK)
         else:
             return Response({'error': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
