@@ -85,11 +85,11 @@ class UserProfileAboutSerializer(serializers.ModelSerializer):
         # Check constraints
         min_birth_date = date.today() - relativedelta(years=16)
         if birth_date > min_birth_date:
-            raise serializers.ValidationError('Birth date cannot be later than 16 years ago')
+            raise serializers.ValidationError('Birth date cannot be less than 16 years ago')
 
         max_birth_date = date.today() - relativedelta(years=120)
         if birth_date < max_birth_date:
-            raise serializers.ValidationError('Birth date cannot be earlier than 120 years ago')
+            raise serializers.ValidationError('Birth date cannot be more than 120 years ago')
 
         return birth_date
 
@@ -121,12 +121,12 @@ class UserProfileAboutSerializer(serializers.ModelSerializer):
         other_animals_tags_data = validated_data.pop('other_animals', [])
         interests_tags_data = validated_data.pop('interests', [])
 
-        instance = super().update(instance, validated_data) if instance else super().create(validated_data)
+        about = super().update(instance, validated_data) if instance else super().create(validated_data)
 
-        instance.set_other_animals_tags(other_animals_tags_data)
-        instance.set_interests_tags(interests_tags_data)
+        about.set_other_animals_tags(other_animals_tags_data)
+        about.set_interests_tags(interests_tags_data)
 
-        return instance
+        return about
 
     def update(self, instance, validated_data):
         return self.update_or_create_instance(instance, validated_data)
