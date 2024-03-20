@@ -15,6 +15,4 @@ SHALLWE_CONF_OAUTH_CLIENT_SECRET="гугл секрет", взять в конс
 SHALLWE_CONF_ENV_MODE=по ситуации "DEV", "QA", "STAGE" или "PROD"\
 SHALLWE_CONF_GOOGLE_CALLBACK_URL="https://доменный.адрес.лендинга"\
 SHALLWE_CONF_ALLOWED_HOSTS="host.one","host.two" - запятая даже при одном\
-SHALLWE_CONF_CSRF_TRUSTED_ORIGINS="https://origin.one","https://origin.two" - аналогично\
-SHALLWE_CONF_QA_TEST_USER_PASS="набор символов", получить у девелопера,\
-SHALLWE_CONF_QA_TEST_USER_TOKEN="набор символов", получить у девелопера
+SHALLWE_CONF_CSRF_TRUSTED_ORIGINS="https://origin.one","https://origin.two" - аналогично
