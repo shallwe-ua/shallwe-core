@@ -23,4 +23,4 @@ class DeleteUserView(APIView):
 
     def delete(self, request):
         request.user.delete()
-        return Response('Auth data deleted successfully', 204)
+        return Response(status=204)

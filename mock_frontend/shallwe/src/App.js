@@ -155,8 +155,6 @@ const Setup = () => {
       })
 
       if (response.ok) {
-        let responseBody = await response.json();
-        console.log(responseBody);
         window.location.reload(true); // Force a reload from the server
       } else {
         console.error('Delete request failed:', response.status);
