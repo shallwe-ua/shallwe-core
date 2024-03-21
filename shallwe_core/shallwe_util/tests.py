@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.test import TestCase, Client
-from django.test.client import MULTIPART_CONTENT
+from django.test.client import MULTIPART_CONTENT, encode_multipart, BOUNDARY
 from django.urls import reverse
 
 
@@ -27,6 +27,10 @@ class AuthorizedAPITestCase(TestCase):
             response = client.get(url_reversed, data=query_params)
         else:
             client_http_method = getattr(client, method)
+
+            if 'multipart' in content_type and method not in ('post', 'delete'):
+                data = encode_multipart(BOUNDARY, data)
+
             response = client_http_method(url_reversed, data=data, content_type=content_type, format=_format)
 
         client.logout()
