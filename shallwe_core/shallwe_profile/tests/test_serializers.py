@@ -418,7 +418,7 @@ class UserProfileWithParametersSerializerUpdateTestCase(TestCase):
         self.profile = self.createProfile()
 
         # Lambda functions for mocked methods. Usage "with patch("original.method.path", new=self.mock_method)"
-        self.mock_clean_image = lambda x: Image.open(self.valid_photo)
+        self.mock_clean_image = lambda x: Image.open(x)
         self.mock_check_face = lambda x: True
 
     def getPhoto(self, filename: str = 'valid-format.jpg') -> SimpleUploadedFile:
