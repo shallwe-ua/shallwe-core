@@ -42,6 +42,9 @@ class UserProfile(models.Model):
     # neighbor_preferences
     # ------
 
+    # Optional instance field (set if photo changes or during model deletion) to delete old photos
+    # _photo_paths_to_remove
+
     class Meta:
         constraints = [
             models.CheckConstraint(
@@ -52,7 +55,6 @@ class UserProfile(models.Model):
         ]
 
     def save(self, *args, **kwargs):
-        # Todo: Ensure link related managers (How if they need the profile to be saved first?)
         self._set_old_photos_for_deletion_if_changed()
         super().save(*args, **kwargs)
 
