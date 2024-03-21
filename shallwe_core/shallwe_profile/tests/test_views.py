@@ -1,12 +1,14 @@
+import datetime
 from unittest.mock import patch
 
+from PIL import Image
 from django.core.files.uploadedfile import SimpleUploadedFile
 
-from shallwe_profile.models import UserProfile
+from ..models import UserProfile, UserProfileAbout, UserProfileRentPreferences
 from shallwe_util.tests import AuthorizedAPITestCase
 
 
-class ProfileAPIViewTest(AuthorizedAPITestCase):
+class ProfileCreateAPIViewTest(AuthorizedAPITestCase):
     fixtures = ['locations_mini_fixture.json']
 
     def setUp(self):
@@ -24,7 +26,7 @@ class ProfileAPIViewTest(AuthorizedAPITestCase):
 
     def tearDown(self):
         try:
-            self.user.profile.delete()
+            UserProfile.objects.get(user=self.user).delete()
         except:
             pass
 
@@ -88,6 +90,93 @@ class ProfileAPIViewTest(AuthorizedAPITestCase):
             self.assertIn('profile[hello]', response2.data.get('error'))
 
 
+class ProfileUpdateAPIViewTest(AuthorizedAPITestCase):
+    fixtures = ['locations_mini_fixture.json']
+
+    def setUp(self):
+        self.profile = self.createProfile()
+
+        # Lambda functions for mocked methods. Usage "with patch("original.method.path", new=self.mock_method)"
+        self.mock_clean_image = lambda x: Image.open(x)
+        self.mock_check_face = lambda x: True
+
+    def getPhoto(self, filename: str = 'valid-format.jpg') -> SimpleUploadedFile:
+        from django.contrib.staticfiles import finders
+        jpeg_file_path = finders.find(f'shallwe_profile/img/{filename}')
+
+        # Open the file, read binary data, and create a SimpleUploadedFile
+        with open(jpeg_file_path, 'rb') as jpg_file:
+            jpg_file_data = jpg_file.read()
+            initial_uploaded_file = SimpleUploadedFile(filename, jpg_file_data, content_type="image/jpeg")
+
+        return initial_uploaded_file
+
+    def createProfile(self):
+        # Create a UserProfile instance with an initial JPEG image
+        profile = UserProfile.objects.create(
+            user=self.user,
+            name='ТестЮзер',
+            photo_w768=self.getPhoto()
+        )
+        about = UserProfileAbout.objects.create(user_profile=profile, **{
+            'birth_date': datetime.date.fromisoformat('1960-02-02'),
+            'gender': 1,
+            'is_couple': True,
+            'has_children': False
+        })
+        about.set_interests_tags(['гулять'])
+
+        UserProfileRentPreferences.objects.create(user_profile=profile, **{
+            'min_budget': 1000,
+            'max_budget': 2000
+        })
+
+        return profile
+
+    def tearDown(self):
+        UserProfile.objects.get(user=self.user).delete()
+
+    def _get_response_shortcut(self, data: dict):
+        url = 'profile-me'
+        method = 'patch'
+        response = self._get_response(url, method=method, data=data, _format='multipart')
+        return response
+
+    def _get_image(self, filename: str = 'valid-format.jpg'):
+        from django.contrib.staticfiles import finders
+        full_path = finders.find('shallwe_profile/img/' + filename)
+        image_file = open(full_path, 'rb')
+        return image_file
+
+    def test_profile_update_valid(self):
+        def check(data):
+            response = self._get_response_shortcut(data)
+            self.assertEqual(response.status_code, 200)
+            return response
+
+        def get_profile():
+            return UserProfile.objects.get(pk=self.profile.pk)
+
+        valid_data1 = {
+            'profile[name]': 'Мар\'яна',
+            'profile[photo]': self._get_image()
+        }
+        check(valid_data1)
+        self.assertEqual(get_profile().name, "Мар'яна")
+
+        valid_data2 = {
+            'about[gender]': 2
+        }
+        check(valid_data2)
+        self.assertEqual(get_profile().about.gender, 2)
+
+        valid_data3 = {
+            'rent_preferences[room_sharing_level]': 1
+        }
+        check(valid_data3)
+        self.assertEqual(get_profile().rent_preferences.room_sharing_level, 1)
+
+
 class ProfileVisibilityViewTestCase(AuthorizedAPITestCase):
     def setUp(self):
         self.profile = self.createProfile()
@@ -112,12 +201,17 @@ class ProfileVisibilityViewTestCase(AuthorizedAPITestCase):
 
     def tearDown(self):
         try:
-            self.user.profile.delete()
+            UserProfile.objects.get(user=self.user).delete()
         except:
             pass
 
     def _get_response_shortcut(self, data):
-        response = self._get_response('profile-visibility', method='patch', data=data, content_type='application/json')
+        response = self._get_response(
+            'profile-visibility',
+            method='patch',
+            data=data,
+            content_type='application/json'
+        )
         return response
 
     def test_profile_visibility_view_valid(self):
