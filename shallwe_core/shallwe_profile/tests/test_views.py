@@ -1,4 +1,6 @@
 import datetime
+import json
+from collections import OrderedDict
 from unittest.mock import patch
 
 from PIL import Image
@@ -175,6 +177,116 @@ class ProfileUpdateAPIViewTest(AuthorizedAPITestCase):
         }
         check(valid_data3)
         self.assertEqual(get_profile().rent_preferences.room_sharing_level, 1)
+
+
+class ProfileReadAPIViewTest(AuthorizedAPITestCase):
+    fixtures = ['locations_mini_fixture.json']
+
+    def setUp(self):
+        self.profile = self.createProfile()
+
+    def getPhoto(self, filename: str = 'valid-format.jpg') -> SimpleUploadedFile:
+        from django.contrib.staticfiles import finders
+        jpeg_file_path = finders.find(f'shallwe_profile/img/{filename}')
+
+        # Open the file, read binary data, and create a SimpleUploadedFile
+        with open(jpeg_file_path, 'rb') as jpg_file:
+            jpg_file_data = jpg_file.read()
+            initial_uploaded_file = SimpleUploadedFile(filename, jpg_file_data, content_type="image/jpeg")
+
+        return initial_uploaded_file
+
+    def createProfile(self):
+        # Create a UserProfile instance with an initial JPEG image
+        profile = UserProfile.objects.create(
+            user=self.user,
+            name='ТестЮзер',
+            photo_w768=self.getPhoto()
+        )
+        about = UserProfileAbout.objects.create(user_profile=profile, **{
+            'birth_date': datetime.date.fromisoformat('1960-02-02'),
+            'gender': 1,
+            'is_couple': True,
+            'has_children': False
+        })
+        about.set_interests_tags(['гулять'])
+
+        UserProfileRentPreferences.objects.create(user_profile=profile, **{
+            'min_budget': 1000,
+            'max_budget': 2000
+        })
+
+        return profile
+
+    def tearDown(self):
+        UserProfile.objects.get(user=self.user).delete()
+
+    def _get_response_shortcut(self):
+        url = 'profile-me'
+        method = 'get'
+        response = self._get_response(url, method=method)
+        return response
+
+    def _get_image(self, filename: str = 'valid-format.jpg'):
+        from django.contrib.staticfiles import finders
+        full_path = finders.find('shallwe_profile/img/' + filename)
+        image_file = open(full_path, 'rb')
+        return image_file
+
+    def test_basic_profile_retrieval(self):
+        expected_json = json.dumps(
+            OrderedDict([('profile',
+                OrderedDict([('is_hidden', False),
+                           ('name', 'ТестЮзер'),
+                           ('photo_w768',
+                            '/media/profile-photos/valid-format.webp'),
+                           ('photo_w540',
+                            '/media/CACHE/images/profile-photos/valid-format/48b30af8f559237f115cb97f6b29d6c3.webp'),
+                           ('photo_w192',
+                            '/media/CACHE/images/profile-photos/valid-format/ffdfdd5001b678517d6f10c82650581a.webp'),
+                           ('photo_w64',
+                            '/media/CACHE/images/profile-photos/valid-format/181eccfd1992d4775c37070e9b98e463.webp')])),
+                ('rent_preferences',
+                OrderedDict([('min_budget', 1000),
+                           ('max_budget', 2000),
+                           ('min_rent_duration_level', 1),
+                           ('max_rent_duration_level', 5),
+                           ('room_sharing_level', 2),
+                           ('locations',
+                            OrderedDict([('regions', []),
+                                         ('cities', []),
+                                         ('other_ppls', [])]))])),
+                ('about',
+                OrderedDict([('birth_date', '1960-02-02'),
+                           ('gender', 1),
+                           ('is_couple', True),
+                           ('has_children', False),
+                           ('occupation_type', None),
+                           ('drinking_level', None),
+                           ('smoking_level', None),
+                           ('smokes_iqos', False),
+                           ('smokes_vape', False),
+                           ('smokes_tobacco', False),
+                           ('smokes_cigs', False),
+                           ('neighbourliness_level', None),
+                           ('guests_level', None),
+                           ('parties_level', None),
+                           ('bedtime_level', None),
+                           ('neatness_level', None),
+                           ('has_cats', False),
+                           ('has_dogs', False),
+                           ('has_reptiles', False),
+                           ('has_birds', False),
+                           ('other_animals', []),
+                           ('interests', ['гулять']),
+                           ('bio', None)]))])
+        )
+
+        response = self._get_response_shortcut()
+        response_json = json.dumps(response.data)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response_json, expected_json)
 
 
 class ProfileVisibilityViewTestCase(AuthorizedAPITestCase):

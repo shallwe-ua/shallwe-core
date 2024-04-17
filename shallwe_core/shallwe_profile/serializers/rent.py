@@ -1,13 +1,14 @@
+from collections import OrderedDict
+
 from django.db.models import QuerySet
 from rest_framework import serializers
-from rest_framework.fields import empty
 
 from shallwe_locations.models import Location
 from .common import non_required_char_list_field
 from ..models import UserProfileRentPreferences
 
 
-class UserProfileRentPreferencesSerializer(serializers.ModelSerializer):
+class UserProfileRentPreferencesCreateUpdateSerializer(serializers.ModelSerializer):
     # Locations passed as hierarchies list
     locations = non_required_char_list_field()
 
@@ -89,3 +90,98 @@ class UserProfileRentPreferencesSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         return self.create_or_update_instance(None, validated_data)
+
+
+class UserProfilePreferredLocationReadSerializer(serializers.ModelSerializer):
+    city = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Location
+        fields = '__all__'
+
+    def get_city(self, obj):
+        if obj.category == 'd' and obj.city:
+            city_serializer = self.__class__(obj.city)
+            return OrderedDict(city_serializer.data)
+
+
+class UserProfileRentPreferencesReadSerializer(serializers.ModelSerializer):
+    locations = UserProfilePreferredLocationReadSerializer(read_only=True, many=True)
+
+    class Meta:
+        model = UserProfileRentPreferences
+        exclude = ['id', 'user_profile']
+
+    def _group_locations_by_category(self, locations_repr):
+        serialized_locations = OrderedDict([
+            ('regions', []),
+            ('cities', []),
+            ('other_ppls', [])
+        ])
+
+        city_map = {}
+
+        for location in locations_repr:
+            category = location['category']
+
+            # Regions
+            if category == 'r':
+                serialized_locations['regions'].append(OrderedDict([
+                    ('hierarchy', location['hierarchy']),
+                    ('region_name', location['region_name'])
+                ]))
+
+            # Cities
+            elif category == 'c':
+                serialized_locations['cities'].append(OrderedDict([
+                    ('hierarchy', location['hierarchy']),
+                    ('ppl_name', location['ppl_name']),
+                    ('districts', [])
+                ]))
+
+            # Other PPLs
+            elif category == 'p':
+                serialized_locations['other_ppls'].append(OrderedDict([
+                    ('hierarchy', location['hierarchy']),
+                    ('region_name', location['region_name']),
+                    ('subregion_name', location['subregion_name']),
+                    ('ppl_name', location['ppl_name'])
+                ]))
+
+            # City districts
+            elif category == 'd':
+                district_repr = OrderedDict([
+                    ('hierarchy', location['hierarchy']),
+                    ('district_name', location['district_name'])
+                ])
+
+                city_raw_repr = location['city']
+                city_hierarchy, city_ppl_name = city_raw_repr['hierarchy'], city_raw_repr['ppl_name']
+
+                # Map the city if not already and place the district there
+                if city_hierarchy in city_map:
+                    city_map[city_hierarchy]['districts'].append(district_repr)
+                else:
+                    city_clean_repr = OrderedDict([
+                        ('hierarchy', city_hierarchy),
+                        ('ppl_name', city_ppl_name),
+                        ('districts', [district_repr])
+                    ])
+                    city_map[city_hierarchy] = city_clean_repr
+
+        serialized_locations['cities'] += city_map.values()
+
+        serialized_locations_container = OrderedDict([('locations', serialized_locations)])
+
+        return serialized_locations_container
+
+    @property
+    def data(self):
+        return OrderedDict(super().data)
+
+    def to_representation(self, instance):
+        rent_preferences_repr = super().to_representation(instance)
+        locations_repr = rent_preferences_repr.pop('locations')
+        locations_by_category_repr = self._group_locations_by_category(locations_repr)
+        rent_preferences_repr |= locations_by_category_repr
+        return rent_preferences_repr

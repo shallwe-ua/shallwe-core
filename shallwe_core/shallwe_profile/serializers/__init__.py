@@ -1,3 +1,3 @@
-from .rent import UserProfileRentPreferencesSerializer
-from .profile import UserProfileBaseSerializer, UserProfileWithParametersSerializer
-from .visibility import UserProfileVisibilitySerializer
+from .rent import UserProfileRentPreferencesCreateUpdateSerializer, UserProfileRentPreferencesReadSerializer
+from .profile import UserProfileBaseCreateUpdateSerializer, UserProfileWithParametersCreateUpdateSerializer
+from .visibility import UserProfileVisibilityUpdateSerializer

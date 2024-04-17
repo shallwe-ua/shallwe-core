@@ -3,7 +3,7 @@ from rest_framework import serializers
 from ..models import UserProfile
 
 
-class UserProfileVisibilitySerializer(serializers.ModelSerializer):
+class UserProfileVisibilityUpdateSerializer(serializers.ModelSerializer):
     is_hidden = serializers.BooleanField(required=True)
 
     class Meta:

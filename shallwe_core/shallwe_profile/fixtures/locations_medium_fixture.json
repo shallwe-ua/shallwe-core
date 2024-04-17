@@ -1,0 +1,99 @@
+[
+  {
+    "fields": {
+      "hierarchy": "UA",
+      "category": "a",
+      "region_name": null,
+      "subregion_name": null,
+      "ppl_name": null,
+      "district_name": null,
+      "search_name": "Вся Україна",
+      "city": null
+    },
+    "model": "shallwe_locations.location",
+    "pk": "00000"
+  },
+  {
+    "fields": {
+      "hierarchy": "UA05",
+      "category": "r",
+      "region_name": "Вінницька",
+      "subregion_name": null,
+      "ppl_name": null,
+      "district_name": null,
+      "search_name": "Вінницька",
+      "city": null
+    },
+    "model": "shallwe_locations.location",
+    "pk": "10236"
+  },
+  {
+    "fields": {
+      "hierarchy": "UA0501001001",
+      "category": "c",
+      "region_name": "Вінницька",
+      "subregion_name": "Вінницький",
+      "ppl_name": "Вінниця",
+      "district_name": null,
+      "search_name": "Вінниця",
+      "city": null
+    },
+    "model": "shallwe_locations.location",
+    "pk": "10902"
+  },
+  {
+    "fields": {
+      "hierarchy": "UA050100100101",
+      "category": "d",
+      "region_name": "Вінницька",
+      "subregion_name": "Вінницький",
+      "ppl_name": "Вінниця",
+      "district_name": "Вінниця-1",
+      "search_name": "Вінниця-1",
+      "city": "10902"
+    },
+    "model": "shallwe_locations.location",
+    "pk": "10903"
+  },
+  {
+    "fields": {
+      "hierarchy": "UA050100100102",
+      "category": "d",
+      "region_name": "Вінницька",
+      "subregion_name": "Вінницький",
+      "ppl_name": "Вінниця",
+      "district_name": "Вінниця-2",
+      "search_name": "Вінниця-2",
+      "city": "10902"
+    },
+    "model": "shallwe_locations.location",
+    "pk": "10904"
+  },
+  {
+    "fields": {
+      "hierarchy": "UA0501001002",
+      "category": "p",
+      "region_name": "Вінницька",
+      "subregion_name": "Вінницький",
+      "ppl_name": "Полянка",
+      "district_name": null,
+      "search_name": "Полянка",
+      "city": null
+    },
+    "model": "shallwe_locations.location",
+    "pk": "10905"
+  },
+  {
+    "fields": {
+      "hierarchy": "UA01",
+      "category": "r",
+      "region_name": "АР Крим",
+      "subregion_name": null,
+      "ppl_name": null,
+      "district_name": null,
+      "search_name": "АР Крим",
+      "city": null
+    },
+    "model": "shallwe_locations.location",
+    "pk": "13043"
+  }]

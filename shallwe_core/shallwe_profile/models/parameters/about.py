@@ -121,7 +121,8 @@ class UserProfileAbout(models.Model):
         null=False,
         related_name='about'
     )
-
+    
+    # Todo: не вынести ли в профиль это? Логичнее и всё равно пригодится
     creation_date = models.DateField(null=False, auto_now_add=True)  # Reference point for max birth_date validation
 
     # Todo: GeneratedField для возраста? (а будет ли он обновляться)

@@ -1,4 +1,5 @@
 import re
+from collections import OrderedDict
 from datetime import date
 
 from dateutil.relativedelta import relativedelta
@@ -9,39 +10,40 @@ from ..models import UserProfileAbout
 from .common import non_required_char_list_field
 
 
-class UserProfileAboutSerializer(serializers.ModelSerializer):
+ABOUT_FIELDS = [
+    'birth_date',
+    'gender',
+    'is_couple',
+    'has_children',
+    'occupation_type',
+    'drinking_level',
+    'smoking_level',
+    'smokes_iqos',
+    'smokes_vape',
+    'smokes_tobacco',
+    'smokes_cigs',
+    'neighbourliness_level',
+    'guests_level',
+    'parties_level',
+    'bedtime_level',
+    'neatness_level',
+    'has_cats',
+    'has_dogs',
+    'has_reptiles',
+    'has_birds',
+    'other_animals',
+    'interests',
+    'bio'
+]
+
+
+class UserProfileAboutCreateUpdateSerializer(serializers.ModelSerializer):
     other_animals = non_required_char_list_field()
     interests = non_required_char_list_field()
 
     class Meta:
         model = UserProfileAbout
-        fields = [
-            'birth_date',
-            'gender',
-            'is_couple',
-            'has_children',
-            'occupation_type',
-            'drinking_level',
-            'smoking_level',
-            'smokes_iqos',
-            'smokes_vape',
-            'smokes_tobacco',
-            'smokes_cigs',
-            'neighbourliness_level',
-            'guests_level',
-            'parties_level',
-            'bedtime_level',
-            'neatness_level',
-            'has_cats',
-            'has_dogs',
-            'has_reptiles',
-            'has_birds',
-
-            'other_animals',
-            'interests',
-
-            'bio'
-        ]
+        fields = ABOUT_FIELDS
 
     def _check_tags(self, attr_name, tags, regex, constraints_message):
         # Check length
@@ -133,3 +135,27 @@ class UserProfileAboutSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         return self.update_or_create_instance(None, validated_data)
+
+
+class UserProfileAboutReadSerializer(serializers.ModelSerializer):
+    other_animals = serializers.SerializerMethodField()
+    interests = serializers.SerializerMethodField()
+
+    class Meta:
+        model = UserProfileAbout
+        fields = ABOUT_FIELDS
+
+    def _get_tags_as_list(self, tags_queryset):
+        result = list(tags_queryset.values_list('name', flat=True))
+        result.sort()
+        return result
+
+    def get_other_animals(self, obj):
+        return self._get_tags_as_list(obj.other_animals_tags.all())
+
+    def get_interests(self, obj):
+        return self._get_tags_as_list(obj.interests_tags.all())
+
+    @property
+    def data(self):
+        return OrderedDict(super().data)

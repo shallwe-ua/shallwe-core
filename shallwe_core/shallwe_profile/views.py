@@ -6,14 +6,16 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from shallwe_util.views import MultiPartWithNestedToJSONParser, validate_received_data_structure, UnexpectedFieldError
-from .serializers import UserProfileWithParametersSerializer, UserProfileVisibilitySerializer
+from .serializers import UserProfileWithParametersCreateUpdateSerializer, UserProfileVisibilityUpdateSerializer
+from .serializers.profile import UserProfileWithParametersReadSerializer
 
 
 class ProfileAPIView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = [MultiPartWithNestedToJSONParser]
 
-    serializer_post, serializer_patch = [UserProfileWithParametersSerializer] * 2
+    serializer_post, serializer_patch = [UserProfileWithParametersCreateUpdateSerializer] * 2
+    serializer_get = UserProfileWithParametersReadSerializer
 
     def _clean_list_values(self, jsonified_data):
         """Needed for converting single values to lists, because multipart does not support sending 1-element lists"""
@@ -74,11 +76,20 @@ class ProfileAPIView(APIView):
         else:
             return Response({'error': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
+    def get(self, request):
+        if not hasattr(request.user, 'profile'):
+            return Response({'error': 'This user has no profile to operate with'}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = self.serializer_get(instance=request.user.profile)
+        profile_data = serializer.data
+
+        return Response(data=profile_data, status=status.HTTP_200_OK)
+
 
 class ProfileVisibilityAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
-    serializer_patch = UserProfileVisibilitySerializer
+    serializer_patch = UserProfileVisibilityUpdateSerializer
 
     def patch(self, request):
         if not hasattr(request.user, 'profile'):
