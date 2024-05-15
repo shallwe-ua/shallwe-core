@@ -19,9 +19,9 @@ class AuthorizedAPITestCase(TestCase):
         client.defaults['HTTP_X_CSRFTOKEN'] = csrftoken_cookie
         return client
 
-    def _get_response(self, url, method='get', data=None, query_params=None, content_type=MULTIPART_CONTENT, _format=None):
+    def _get_response(self, url, method='get', data=None, query_params=None, content_type=MULTIPART_CONTENT, _format=None, authenticated=True):
         url_reversed = reverse(url)
-        client = self._get_authenticated_client()
+        client = self._get_authenticated_client() if authenticated else Client()
 
         if method == 'get':
             response = client.get(url_reversed, data=query_params)
