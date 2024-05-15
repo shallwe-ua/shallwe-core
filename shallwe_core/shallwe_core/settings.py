@@ -53,7 +53,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
     'shallwe_auth',
-    'shallwe_app',
+    'shallwe_access',
     'shallwe_locations',
     'shallwe_photo',
     'shallwe_profile'

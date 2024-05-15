@@ -21,12 +21,12 @@ from django.conf.urls.static import static
 
 
 urlpatterns = [
-    path('', include('shallwe_app.urls')),
     path('admin/', admin.site.urls),
     path('api/rest/', include([
         path('auth/', include('shallwe_auth.urls')),
         path('locations/', include('shallwe_locations.urls')),
         path('photo/', include('shallwe_photo.urls')),
-        path('profile/', include('shallwe_profile.urls'))
+        path('profile/', include('shallwe_profile.urls')),
+        path('access/', include('shallwe_access.urls')),
     ])),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
