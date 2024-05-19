@@ -9,6 +9,7 @@ from rest_framework.views import APIView
 
 
 class GoogleLoginView(SocialLoginView):
+    """Notice: In case of problems with code validation, the second option is access_token + id_token = no problems"""
     adapter_class = GoogleOAuth2Adapter
     callback_url = settings.SHALLWE_CONF_GOOGLE_CALLBACK_URL
     client_class = OAuth2Client
