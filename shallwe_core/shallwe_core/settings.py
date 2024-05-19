@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',
     'rest_framework',
     'rest_framework.authtoken',
     'dj_rest_auth',
@@ -62,6 +63,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -172,6 +174,23 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 
+# CORS settings
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOWED_ORIGINS = SHALLWE_CONF_CORS_ALLOWED_ORIGINS
+CORS_ALLOW_HEADERS = (
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'credentials',  # Include credentials header
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+)
+
+
 # Allauth settings
 SITE_ID = 1
 ACCOUNT_EMAIL_VERIFICATION = 'none'
@@ -214,16 +233,6 @@ PROFILE_INTEREST_REGEX = r'^[а-яА-ЯёЁіІїЇєЄґҐ`\'\-\s]{2,32}$'
 
 
 # Mode-specific settings
-# For proper frontend dir
-frontend_dir = 'mock_frontend' if SHALLWE_CONF_ENV_MODE in ['DEV', 'QA'] else 'frontend'
-
-TEMPLATES[0]['DIRS'] += [
-    BASE_DIR / frontend_dir,
-]
-STATICFILES_DIRS += [
-    BASE_DIR / frontend_dir / 'static',
-]
-
 # For database schema
 if SHALLWE_CONF_ENV_MODE == 'DEV':
     INSTALLED_APPS.append('django_extensions')
