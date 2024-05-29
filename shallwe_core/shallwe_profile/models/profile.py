@@ -55,6 +55,19 @@ class UserProfile(models.Model):
             ),
         ]
 
+    def __str__(self):
+        # String start
+        obj_string = f'{self.__class__.__name__}(SelfID: {self.pk}, UserID: {self.user.pk}) - [{self.name}'
+
+        # Add birth_date from about if exists
+        if hasattr(self, 'about') and self.about.birth_date:
+            obj_string += f', {self.about.birth_date}'
+
+        # Close the bracket
+        obj_string += ']'
+
+        return obj_string
+
     def save(self, *args, **kwargs):
         self._set_old_photos_for_deletion_if_changed()
         super().save(*args, **kwargs)

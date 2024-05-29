@@ -98,6 +98,11 @@ class Location(models.Model):
             ),
         ]
 
+    def __str__(self):
+        obj_string = (f'{self.__class__.__name__}(H: {self.hierarchy}) -'
+                      f' [Search: {self.search_name}, Reg: {self.region_name}, Ppl: {self.ppl_name}]')
+        return obj_string
+
     @classmethod
     def get_all_country(cls) -> 'Location':
         return cls.objects.get(category='a')

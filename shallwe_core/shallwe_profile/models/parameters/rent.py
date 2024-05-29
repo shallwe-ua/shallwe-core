@@ -115,6 +115,10 @@ class UserProfileRentPreferences(models.Model):
             ),
         ]
 
+    def __str__(self):
+        obj_string = f'{self.__class__.__name__}({str(self.user_profile)})'
+        return obj_string
+
     def __init__(self, *args, **kwargs):
         self._validate_init_values(kwargs)
         super().__init__(*args, **kwargs)

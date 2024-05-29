@@ -185,6 +185,10 @@ class UserProfileAbout(models.Model):
             ),
         ]
 
+    def __str__(self):
+        obj_string = f'{self.__class__.__name__}({str(self.user_profile)})'
+        return obj_string
+
     def save(self, *args, **kwargs):
         self._check_birth_date_valid()
         super().save(*args, **kwargs)

@@ -114,6 +114,10 @@ class UserProfileNeighborPreferences(models.Model):
             )
         ]
 
+    def __str__(self):
+        obj_string = f'{self.__class__.__name__}({str(self.user_profile)})'
+        return obj_string
+
     def _set_list_values(self, field_name: str, values: Collection[models.IntegerChoices] = None):
         if values:
             if len(set(values)) != len(values):
