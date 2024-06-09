@@ -175,15 +175,37 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 
+# Logging
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "file": {
+            "level": "DEBUG",
+            "class": "logging.FileHandler",
+            "filename": "/tmp/debug.log",
+        },
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["file"],
+            "level": "DEBUG",
+            "propagate": True,
+        },
+    },
+}
+
+
 # CORS settings
 CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOWED_ORIGINS = SHALLWE_CONF_CORS_ALLOWED_ORIGINS
+CORS_ALLOWED_ORIGINS = [*SHALLWE_CONF_CORS_ALLOWED_ORIGINS]
 CORS_ALLOW_HEADERS = (
     'accept',
     'accept-encoding',
     'authorization',
     'content-type',
     'credentials',  # Include credentials header
+    'cookie',
     'dnt',
     'origin',
     'user-agent',
@@ -237,3 +259,12 @@ PROFILE_INTEREST_REGEX = r'^[а-яА-ЯёЁіІїЇєЄґҐ`\'\-\s]{2,32}$'
 # For database schema
 if SHALLWE_CONF_ENV_MODE == 'DEV':
     INSTALLED_APPS.append('django_extensions')
+
+# Cookies
+if SHALLWE_CONF_ENV_MODE != 'DEV':
+    SESSION_COOKIE_SAMESITE = None
+    SESSION_COOKIE_SECURE = True
+    SESSION_COOKIE_DOMAIN = SHALLWE_CONF_CREDENTIALS_COOKIE_DOMAIN
+    CSRF_COOKIE_SAMESITE = None
+    CSRF_COOKIE_SECURE = True
+    CSRF_COOKIE_DOMAIN = SHALLWE_CONF_CREDENTIALS_COOKIE_DOMAIN
