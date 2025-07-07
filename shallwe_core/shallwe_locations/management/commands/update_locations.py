@@ -3,6 +3,7 @@ from copy import deepcopy
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
+from tqdm import tqdm
 
 from ...models import Location
 
@@ -368,7 +369,8 @@ class Command(BaseCommand):
         with (open(csv_file, 'r', encoding='utf-8') as file):
             reader = csv.DictReader(file, fieldnames=KATOTTGFieldnames.get_all())
             next(reader)
-            for row in reader:
+            rows = list(reader)
+            for row in tqdm(rows, desc="Parsing CSV", unit="rows"):
                 if src_entity := KATOTTGEntity(row):
                     locations.register(src_entity)
         return locations
