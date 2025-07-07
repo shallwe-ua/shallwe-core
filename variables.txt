@@ -4,6 +4,7 @@
 NEXT_PUBLIC_SHALLWE_API_BASE_URL=https://адрес.бекенда.апи
 NEXT_PUBLIC_SHALLWE_GOOGLE_REDIRECT_URI=https://доменный.адрес.лендинга
 NEXT_PUBLIC_SHALLWE_GOOGLE_CLIENT_ID=гугл клиент
+NEXT_PUBLIC_SHALLWE_SKIP_MIDDLEWARE=true/false
 
 
 ---

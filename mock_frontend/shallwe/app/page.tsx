@@ -36,6 +36,7 @@ const Home = () => {
           });
 
           if (response.ok) {
+            console.log()
             const responseBody = await response.json();
             console.log(responseBody);
             window.location.reload(); // Force a reload from the server

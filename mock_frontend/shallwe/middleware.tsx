@@ -1,8 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 const apiBaseUrl = process.env.NEXT_PUBLIC_SHALLWE_API_BASE_URL || '';
+const skipMiddleware = process.env.NEXT_PUBLIC_SHALLWE_SKIP_MIDDLEWARE === 'true';
 
 export async function middleware(request: NextRequest) {
+
+    // If in mock mode, skip all auth/profile checks
+    if (skipMiddleware) {
+        return NextResponse.next();
+    }
 
     const url = request.nextUrl.clone();
 
