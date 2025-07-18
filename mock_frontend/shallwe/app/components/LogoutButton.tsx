@@ -1,7 +1,10 @@
 import React from 'react';
 import Cookies from 'js-cookie';
+import { env } from "@/config/env";
 
-const apiBaseUrl = process.env.NEXT_PUBLIC_SHALLWE_API_BASE_URL || '';
+
+const apiBaseUrl = env.NEXT_PUBLIC_SHALLWE_API_BASE_URL || '';
+
 
 const LogoutButton = () => {
   const handleLogout = async () => {

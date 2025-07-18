@@ -1,7 +1,9 @@
+.env*
+./!.env.example
 /venv/
+/.venv/
 /.idea/
-**/.env
-**/__pycache__/
+__pycache__
 /shallwe_core/mock_frontend/
 /shallwe_core/staticfiles/
 /shallwe_core/media/

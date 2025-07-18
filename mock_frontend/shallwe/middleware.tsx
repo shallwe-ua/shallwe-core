@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { env } from "@/config/env";
 
-const apiBaseUrl = process.env.NEXT_PUBLIC_SHALLWE_API_BASE_URL || '';
-const skipMiddleware = process.env.NEXT_PUBLIC_SHALLWE_SKIP_MIDDLEWARE === 'true';
+
+const apiBaseUrl = env.NEXT_PUBLIC_SHALLWE_API_BASE_URL || '';
+const skipMiddleware = env.NEXT_PUBLIC_SHALLWE_SKIP_MIDDLEWARE === 'true';
+
 
 export async function middleware(request: NextRequest) {
 

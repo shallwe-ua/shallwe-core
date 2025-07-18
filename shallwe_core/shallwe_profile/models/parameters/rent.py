@@ -164,7 +164,7 @@ class UserProfilePreferredLocations(models.Model):
         unique_together = ('related_preferences', 'location')
 
 
-if settings.SHALLWE_CONF_ENV_MODE == 'DEV':
+if settings.SHALLWE_GLOBAL_ENV_MODE == 'DEV':
     validate_locations_no_overlap = time_measure(
         validate_locations_no_overlap
     )

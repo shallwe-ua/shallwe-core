@@ -2,10 +2,13 @@
 
 import React, { useEffect, useRef } from 'react';
 import PageWithBigText from './components/PageWithBigText';
-import Cookies from 'js-cookie';
+import { env } from "@/config/env";
 
-const fontSize = '2em';
-const baseUrl = process.env.NEXT_PUBLIC_SHALLWE_API_BASE_URL || '';
+
+const baseUrl = env.NEXT_PUBLIC_SHALLWE_API_BASE_URL || '';
+const redirectURI = env.NEXT_PUBLIC_SHALLWE_OAUTH_REDIRECT_URI;
+const googleClientID = env.NEXT_PUBLIC_SHALLWE_OAUTH_CLIENT_ID;
+
 
 const Home = () => {
   const requestSent = useRef(false); // Track if the request has been sent
@@ -71,8 +74,6 @@ const Home = () => {
     }
   };
 
-  const redirectURI = process.env.NEXT_PUBLIC_SHALLWE_GOOGLE_REDIRECT_URI;
-  const googleClientID = process.env.NEXT_PUBLIC_SHALLWE_GOOGLE_CLIENT_ID;
   const googleAuthUri = `https://accounts.google.com/o/oauth2/v2/auth?redirect_uri=${redirectURI}&prompt=consent&response_type=code&client_id=${googleClientID}&scope=openid&access_type=offline`;
 
   return (

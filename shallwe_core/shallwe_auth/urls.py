@@ -10,7 +10,7 @@ urlpatterns = [
 ]
 
 
-if settings.SHALLWE_CONF_ENV_MODE in ('DEV', 'QA'):
+if settings.SHALLWE_GLOBAL_ENV_MODE in ('DEV', 'QA'):
     from .test_views import SampleAuthenticatedView, SampleGeneralView
     urlpatterns += [
         path('test-api-protected/', SampleAuthenticatedView.as_view(), name='test-api-protected'),

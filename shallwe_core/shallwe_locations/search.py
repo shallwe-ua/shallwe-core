@@ -55,5 +55,5 @@ def search(search_term: str) -> SearchResult:
     return result
 
 
-if settings.SHALLWE_CONF_ENV_MODE == 'DEV':
+if settings.SHALLWE_GLOBAL_ENV_MODE == 'DEV':
     search = time_measure(search)

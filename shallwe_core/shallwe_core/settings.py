@@ -12,8 +12,12 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 
-# Import build-specific variables and secrets (DO NOT SHARE ON GITHUB)
-from .build_config import *
+
+# Try to load the env constants from ./envconfig/envconstants.py
+# ./envconfig/envconstants.py should contain parsed and validated env vars as python constants
+# It is generated/updated automatically by running parse_to_constants.py as a shell script
+from .envconfig.envconstants import *
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -23,15 +27,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = SHALLWE_CONF_SECRET_KEY
+SECRET_KEY = SHALLWE_BACKEND_SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 
-ALLOWED_HOSTS = [*SHALLWE_CONF_ALLOWED_HOSTS]
+ALLOWED_HOSTS = [*SHALLWE_BACKEND_ALLOWED_HOSTS]
 
-CSRF_TRUSTED_ORIGINS = [*SHALLWE_CONF_CSRF_TRUSTED_ORIGINS]
+CSRF_TRUSTED_ORIGINS = [*SHALLWE_BACKEND_CSRF_TRUSTED_ORIGINS]
 
 
 # Application definition
@@ -108,13 +112,13 @@ WSGI_APPLICATION = 'shallwe_core.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': SHALLWE_CONF_DB_NAME,
-        'USER': SHALLWE_CONF_DB_USER,
-        'PASSWORD': SHALLWE_CONF_DB_PASS,
-        'HOST': SHALLWE_CONF_DB_HOST or 'localhost',
-        'PORT': SHALLWE_CONF_DB_PORT or '5432',
+        'NAME': SHALLWE_BACKEND_DB_NAME,
+        'USER': SHALLWE_BACKEND_DB_USER,
+        'PASSWORD': SHALLWE_BACKEND_DB_PASS,
+        'HOST': SHALLWE_BACKEND_DB_HOST or 'localhost',
+        'PORT': SHALLWE_BACKEND_DB_PORT or '5432',
         'TEST': {
-            'NAME': SHALLWE_CONF_TEST_DB_NAME,
+            'NAME': SHALLWE_BACKEND_TEST_DB_NAME,
         }
     }
 }
@@ -198,7 +202,7 @@ LOGGING = {
 
 # CORS settings
 CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOWED_ORIGINS = [*SHALLWE_CONF_CORS_ALLOWED_ORIGINS]
+CORS_ALLOWED_ORIGINS = [*SHALLWE_BACKEND_CORS_ALLOWED_ORIGINS]
 CORS_ALLOW_HEADERS = (
     'accept',
     'accept-encoding',
@@ -226,8 +230,8 @@ SOCIALACCOUNT_PROVIDERS = {
            'access_type': 'offline',
        },
        'APP': {
-           'client_id': SHALLWE_CONF_OAUTH_CLIENT_ID,
-           'secret': SHALLWE_CONF_OAUTH_CLIENT_SECRET
+           'client_id': SHALLWE_GLOBAL_OAUTH_CLIENT_ID,
+           'secret': SHALLWE_GLOBAL_OAUTH_CLIENT_SECRET
        }
    }
 }
@@ -257,14 +261,14 @@ PROFILE_INTEREST_REGEX = r'^[а-яА-ЯёЁіІїЇєЄґҐ`\'\-\s]{2,32}$'
 
 # Mode-specific settings
 # For database schema
-if SHALLWE_CONF_ENV_MODE == 'DEV':
+if SHALLWE_GLOBAL_ENV_MODE == 'DEV':
     INSTALLED_APPS.append('django_extensions')
 
 # Cookies
-if SHALLWE_CONF_ENV_MODE != 'DEV':
+if SHALLWE_GLOBAL_ENV_MODE != 'DEV':
     SESSION_COOKIE_SAMESITE = None
     SESSION_COOKIE_SECURE = True
-    SESSION_COOKIE_DOMAIN = SHALLWE_CONF_CREDENTIALS_COOKIE_DOMAIN
+    SESSION_COOKIE_DOMAIN = SHALLWE_BACKEND_CREDENTIALS_COOKIE_DOMAIN
     CSRF_COOKIE_SAMESITE = None
     CSRF_COOKIE_SECURE = True
-    CSRF_COOKIE_DOMAIN = SHALLWE_CONF_CREDENTIALS_COOKIE_DOMAIN
+    CSRF_COOKIE_DOMAIN = SHALLWE_BACKEND_CREDENTIALS_COOKIE_DOMAIN

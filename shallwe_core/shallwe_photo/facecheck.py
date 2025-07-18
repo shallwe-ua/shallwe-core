@@ -40,5 +40,5 @@ def check_face_minified_temp(image: Image.Image):
     return is_face_detected
 
 
-if settings.SHALLWE_CONF_ENV_MODE == 'DEV':
+if settings.SHALLWE_GLOBAL_ENV_MODE == 'DEV':
     check_face = time_measure(check_face)

@@ -2,6 +2,7 @@
 
 import { ReactNode, useEffect, useState } from 'react';
 
+
 export function InitMSW({ children }: { children: ReactNode }) {
   const [ready, setReady] = useState(process.env.NEXT_PUBLIC_SHALLWE_MOCK_API !== 'true');
 

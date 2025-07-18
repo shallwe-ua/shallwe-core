@@ -3,7 +3,6 @@ name = "shallwe-core"
 version = "0.6.1"
 description = "Shallwe UA requirements"
 authors = ["featurelle and team"]
-readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "3.10.18"
@@ -84,13 +83,15 @@ tensorflow-estimator = "2.15.0"
 tensorflow-io-gcs-filesystem = "0.35.0"
 termcolor = "2.4.0"
 tqdm = "4.66.1"
-typing-extensions = "4.8.0"
+typing-extensions = ">=4.12.2, <4.13"
 tzdata = "2023.4"
 urllib3 = "2.1.0"
 werkzeug = "3.0.1"
 wrapt = "1.14.1"
 yarg = "0.1.9"
 django-nested-admin = "^4.1.1"
+pydantic = "^2.11.7"
+pydantic-settings = "^2.10.1"
 
 [build-system]
 requires = ["poetry-core"]

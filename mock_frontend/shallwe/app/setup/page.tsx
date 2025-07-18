@@ -4,8 +4,11 @@ import React from 'react';
 import PageWithBigText from '../components/PageWithBigText';
 import LogoutButton from '../components/LogoutButton';
 import Cookies from 'js-cookie';
+import { env } from "@/config/env";
 
-const baseUrl = process.env.NEXT_PUBLIC_SHALLWE_API_BASE_URL || '';
+
+const baseUrl = env.NEXT_PUBLIC_SHALLWE_API_BASE_URL || '';
+
 
 const Setup = () => {
   const handleTestAuthCall = async () => {
