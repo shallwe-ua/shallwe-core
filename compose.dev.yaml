@@ -1,0 +1,36 @@
+services:
+
+  # spin up local db
+  db:
+    image: postgres:16.9-alpine
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    env_file: [ .env ]
+    environment:
+      POSTGRES_USER: ${SHALLWE_BACKEND_DB_USER:?}
+      POSTGRES_PASSWORD: ${SHALLWE_BACKEND_DB_PASS:?}
+      POSTGRES_DB: ${SHALLWE_BACKEND_DB_NAME:?}
+    ports:
+      - "5434:${SHALLWE_BACKEND_DB_PORT:-5432}"
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-U", "${SHALLWE_BACKEND_DB_USER}" ]
+      interval: 5s
+      retries: 5
+    restart: always
+
+
+  # backend overrides for local build and db
+  backend:
+    build:
+      context: ./shallwe_core      # builds locally
+    volumes:
+      - ./shallwe_core:/app        # mount code for hot reload
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SHALLWE_BACKEND_DB_HOST: db  # override to talk to db container
+
+
+volumes:
+  db_data:

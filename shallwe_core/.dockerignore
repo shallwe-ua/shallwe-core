@@ -1,0 +1,23 @@
+# ------ Python ------
+**/__pycache__
+**/.venv
+**/venv
+poetry.toml
+
+# ------ Build dirs ------
+/staticfiles
+/media
+
+# ------ IDE ------
+**/.idea
+
+# ------ Docker ------
+**/.dockerignore
+**/Dockerfile*
+
+# ------ Git ------
+**/.gitignore
+
+# ------ Config/secret ------
+**/.env*
+shallwe_core/envconfig/envconstants.py
