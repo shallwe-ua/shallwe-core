@@ -30,7 +30,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = SHALLWE_BACKEND_SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = SHALLWE_BACKEND_DEBUG_ON
 
 
 ALLOWED_HOSTS = [*SHALLWE_BACKEND_ALLOWED_HOSTS]
