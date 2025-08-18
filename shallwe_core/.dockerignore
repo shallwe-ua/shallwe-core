@@ -8,9 +8,6 @@ poetry.toml
 /staticfiles
 /media
 
-# ------ IDE ------
-**/.idea
-
 # ------ Docker ------
 **/.dockerignore
 **/Dockerfile*
