@@ -9,7 +9,8 @@ Shallwe was to become the first Ukrainian flatmate-search platform focused on qu
 The project was under development in a private team, but since **July 2024** the project was put on stop with most of the documentation unfortunately lost outside of GitHub.  
 
 Now it's going open-source mostly for technology practice and as a part of my portfolio. Some time from now it will be polished for outsider's view and deployed as a running demo with what was already implemented by July 2024.  
-The rest of planned core features is very unlikely to be added, since I have more viable product ideas awaiting to be implemented.
+
+🚫 The rest of planned core features is very unlikely to be added, since I have more viable product ideas awaiting to be implemented.
 
 ---
 
