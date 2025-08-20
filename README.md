@@ -19,7 +19,7 @@ The simplest way to run the project in development is using **Docker**.
 - Copy `.env.example` → `.env` and provide the required variables (explanations included inside the file). 
 - Run with Docker following the standard workflow.
   
-_Note: you can also use Dockerfile and entrypoint as instructions for local run_ 
+_Note: you can also use docker files and entrypoints as instructions for local run_ 
 
 ---
 📋 **With time, I plan to**:
