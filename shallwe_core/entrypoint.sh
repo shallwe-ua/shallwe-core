@@ -13,19 +13,20 @@ switch_to_idle() {
 
 
 if [ "${SHALLWE_BACKEND_ENTRYPOINT_AUTORUN}" = "true" ]; then
+
   # Prepare config variables
   python3 ./shallwe_core/envconfig/parse_to_constants.py
+
+  # Run tests if autotest active
+  if [ "${SHALLWE_BACKEND_ENTRYPOINT_AUTOTEST}" = "true" ]; then
+    $MANAGEPY test
+  fi
 
   # Prepare database schema
   $MANAGEPY migrate
 
   # Populate locations
   $MANAGEPY update_locations
-
-  # Run tests if autotest active
-  if [ "${SHALLWE_BACKEND_ENTRYPOINT_AUTOTEST}" = "true" ]; then
-    $MANAGEPY test
-  fi
 
   # Create superuser if not exists
   if $MANAGEPY createsuperuser --no-input; then
