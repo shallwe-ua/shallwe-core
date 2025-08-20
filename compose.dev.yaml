@@ -24,7 +24,9 @@ services:
     build:
       context: ./shallwe_core      # builds locally
     volumes:
-      - ./shallwe_core:/app        # mount code for hot reload
+      - ./shallwe_core:/app             # mount code for hot reload
+      - media_data:/app/staticfiles     # separate container's static from host to avoid mutual overrides
+      - static_files:/app/media         # ^ same
     depends_on:
       db:
         condition: service_healthy
@@ -34,3 +36,5 @@ services:
 
 volumes:
   db_data:
+  media_data:
+  static_files:
