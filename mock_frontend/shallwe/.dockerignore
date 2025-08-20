@@ -1,0 +1,14 @@
+# ------ NextJS ------
+**/node_modules
+**/.next/
+**/next-env.d.ts
+/build
+
+# ------ IDE ------
+**/.idea
+
+# ------ Git ------
+**/.gitignore
+
+# ------ Config/secret ------
+**/.env*

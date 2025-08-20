@@ -1,6 +1,38 @@
+# the file contains several profiles for running either separate frontend, backend or combination
+# profiles (scenarios):
+#
+# - api-only: backend only, no frontend
+# - mock-only: frontend only, no backend
+# - mock-dev: backend and frontend dev mode
+# - mock-run: backend and frontend running build*
+# - *mock-builder: build mock frontend for mock-run (preserved)
+
+# run with: docker compose -f compose.yaml -f compose.dev.yaml -f compose.manual.yaml up
+# (omit "-f compose.yaml" base part if using mock-only - not needed)
+
+
+# base mock frontend, for reuse in several scenarios
+x-frontend-base: &frontend-base
+  build:
+    context: ./mock_frontend/shallwe
+  volumes:
+    - ./mock_frontend/shallwe:/app      # mount code for hot reload
+    - /app/node_modules                 # separate container's node_modules from host to avoid mutual overrides
+    - /app/.next                        # ^ same
+  env_file: [ .env ]
+  environment:
+    NEXT_PUBLIC_SHALLWE_ENV_MODE: ${NEXT_PUBLIC_SHALLWE_ENV_MODE:?}
+    NEXT_PUBLIC_SHALLWE_OAUTH_CLIENT_ID: ${NEXT_PUBLIC_SHALLWE_OAUTH_CLIENT_ID:?}
+    NEXT_PUBLIC_SHALLWE_OAUTH_REDIRECT_URI: ${NEXT_PUBLIC_SHALLWE_OAUTH_REDIRECT_URI:?}
+    NEXT_PUBLIC_SHALLWE_API_BASE_URL: ${NEXT_PUBLIC_SHALLWE_API_BASE_URL:?}
+    NEXT_PUBLIC_SHALLWE_SKIP_MIDDLEWARE: ${NEXT_PUBLIC_SHALLWE_SKIP_MIDDLEWARE:?}
+  ports:
+    - "3001:3000"
+
+
 services:
 
-  # spin up local db
+  # spin up local db (except mock-only)
   db:
     image: postgres:16.9-alpine
     volumes:
@@ -17,12 +49,16 @@ services:
       interval: 5s
       retries: 5
     restart: always
+    profiles:
+      - mock-dev
+      - mock-build
+      - api-only
 
 
-  # backend overrides for local build and db
+  # backend overrides for local build and db (except mock-only)
   backend:
     build:
-      context: ./shallwe_core      # builds locally
+      context: ./shallwe_core           # builds locally
     volumes:
       - ./shallwe_core:/app             # mount code for hot reload
       - media_data:/app/staticfiles     # separate container's static from host to avoid mutual overrides
@@ -31,7 +67,46 @@ services:
       db:
         condition: service_healthy
     environment:
-      SHALLWE_BACKEND_DB_HOST: db  # override to talk to db container
+      SHALLWE_BACKEND_DB_HOST: db       # override to talk to db container
+    profiles:
+      - mock-dev
+      - mock-build
+      - api-only
+
+
+  # mock frontend scenarios:
+  # 1) use mock only (no backend)
+  frontend-noapi:
+    <<: *frontend-base
+    command: npm run dev:mock
+    profiles:
+      - mock-only
+
+  # 2) use mock in dev mode
+  frontend-dev:
+    <<: *frontend-base
+    command: npm run dev
+    depends_on:
+      - backend
+    profiles:
+      - mock-dev
+
+  # 3) use mock build
+  # step 1. build artifacts (once after change)
+  frontend-builder:
+    <<: *frontend-base
+    command: npm run build
+    profiles:
+      - mock-builder
+
+  # step 2. run a preserved build
+  frontend-run:
+    <<: *frontend-base
+    command: npm run start
+    depends_on:
+      - backend
+    profiles:
+      - mock-run
 
 
 volumes:
