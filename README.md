@@ -1,6 +1,6 @@
 # Shallwe
 
-> ⚠️ **Work in Progress** This repo is a part of a bigger project code- and knowledge- bases, which is currently undergoing open-sourcing purely for my tech practice since the discontinuation of the actual product development.
+> ⚠️ **Work in Progress** This repo is a part of a bigger project code- and knowledge- bases, which is currently undergoing open-sourcing purely for my tech practice since the discontinuation of the actual product development. It is NOT how the repo is intended to look finally (see the plans below).
 ---
 
 📜 **Background**  
@@ -22,8 +22,9 @@ The simplest way to run the project in development is using **Docker**.
 _Note: you can also use Dockerfile and entrypoint as instructions for local run_ 
 
 ---
-📋 **With time, I plan to**: 
-- Add full documentation  
+📋 **With time, I plan to**:
+- Add full documentation
+- Add logging
 - Provide a minimal demo frontend (⚠️ *not* `mock_frontend`, which is only for the most basic manual tests)  
 - Deploy and run in AWS
 
