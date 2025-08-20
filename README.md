@@ -23,10 +23,10 @@ The simplest way to run the project in development is using **Docker**.
 _Note: you can also use docker files and entrypoints as instructions for local run_ 
 
 ---
-📋 **With time, I plan to**:
+📋 **Nearest plans**:
 - Add full documentation
 - Add logging
-- Provide a minimal demo frontend (⚠️ *not* `mock_frontend`, which is only for the most basic manual tests)  
+- Provide a minimal demo frontend covering all features (⚠️ *not* `mock_frontend`, which is only for the most basic manual tests)  
 - Deploy and run in AWS
 
 There is no strict timeline for this, since it's used as a sandbox of relatively complex codebase to experiment with technology I want to gain a better grasp of.
