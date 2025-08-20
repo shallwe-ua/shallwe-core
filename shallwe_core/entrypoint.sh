@@ -19,7 +19,7 @@ if [ "${SHALLWE_BACKEND_ENTRYPOINT_AUTORUN}" = "true" ]; then
 
   # Run tests if autotest active
   if [ "${SHALLWE_BACKEND_ENTRYPOINT_AUTOTEST}" = "true" ]; then
-    $MANAGEPY test
+    $MANAGEPY test --noinput -v 2
   fi
 
   # Prepare database schema
