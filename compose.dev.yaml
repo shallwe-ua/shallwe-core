@@ -52,7 +52,7 @@ services:
     restart: always
     profiles:
       - mock-dev
-      - mock-build
+      - mock-run
       - api-only
 
 
@@ -72,7 +72,7 @@ services:
       SHALLWE_BACKEND_DB_HOST: db       # override to talk to db container
     profiles:
       - mock-dev
-      - mock-build
+      - mock-run
       - api-only
 
 
