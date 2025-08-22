@@ -27,7 +27,7 @@ x-frontend-base: &frontend-base
     NEXT_PUBLIC_SHALLWE_API_BASE_URL: ${NEXT_PUBLIC_SHALLWE_API_BASE_URL:?}
     NEXT_PUBLIC_SHALLWE_SKIP_MIDDLEWARE: ${NEXT_PUBLIC_SHALLWE_SKIP_MIDDLEWARE:?}
   ports:
-    - "3001:3000"
+    - "3000:3000"
 
 
 services:
@@ -43,7 +43,7 @@ services:
       POSTGRES_PASSWORD: ${SHALLWE_BACKEND_DB_PASS:?}
       POSTGRES_DB: ${SHALLWE_BACKEND_DB_NAME:?}
     ports:
-      - "5434:${SHALLWE_BACKEND_DB_PORT:-5432}"
+      - "5434:${SHALLWE_BACKEND_DB_PORT}"
     healthcheck:
       test: [ "CMD", "pg_isready", "-U", "${SHALLWE_BACKEND_DB_USER}" ]
       interval: 5s

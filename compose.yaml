@@ -27,7 +27,7 @@ services:
       DJANGO_SUPERUSER_PASSWORD: ${DJANGO_SUPERUSER_PASSWORD:?}
       # ---- database ----
       SHALLWE_BACKEND_DB_HOST: ${SHALLWE_BACKEND_DB_HOST:?}
-      SHALLWE_BACKEND_DB_PORT: ${SHALLWE_BACKEND_DB_PORT:-5432}
+      SHALLWE_BACKEND_DB_PORT: ${SHALLWE_BACKEND_DB_PORT:?}
       SHALLWE_BACKEND_DB_NAME: ${SHALLWE_BACKEND_DB_NAME:?}
       SHALLWE_BACKEND_DB_USER: ${SHALLWE_BACKEND_DB_USER:?}
       SHALLWE_BACKEND_DB_PASS: ${SHALLWE_BACKEND_DB_PASS:?}
@@ -39,6 +39,6 @@ services:
       # ---- logs ----
       TF_CPP_MIN_LOG_LEVEL: ${TF_CPP_MIN_LOG_LEVEL:-3}
     ports:
-      - "8080:8000"
+      - "8000:8000"
     entrypoint: ["/app/entrypoint.sh"]
     restart: on-failure
