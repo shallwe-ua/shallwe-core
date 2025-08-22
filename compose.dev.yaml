@@ -63,6 +63,7 @@ services:
       - ./shallwe_core:/app             # mount code for hot reload
       - media_data:/app/staticfiles     # separate container's static from host to avoid mutual overrides
       - static_files:/app/media         # ^ same
+      - django_logs:/tmp/django         # persistent logs for debug
     depends_on:
       db:
         condition: service_healthy
@@ -113,3 +114,4 @@ volumes:
   db_data:
   media_data:
   static_files:
+  django_logs:
