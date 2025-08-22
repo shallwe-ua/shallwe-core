@@ -18,7 +18,7 @@ x-frontend-base: &frontend-base
   volumes:
     - ./mock_frontend/shallwe:/app      # mount code for hot reload
     - /app/node_modules                 # separate container's node_modules from host to avoid mutual overrides
-    - /app/.next                        # ^ same
+    - mock_build:/app/.next             # ^ same
   env_file: [ .env ]
   environment:
     NEXT_PUBLIC_SHALLWE_ENV_MODE: ${NEXT_PUBLIC_SHALLWE_ENV_MODE:?}
@@ -116,3 +116,4 @@ volumes:
   media_data:
   static_files:
   django_logs:
+  mock_build:
