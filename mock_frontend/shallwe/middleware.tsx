@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { env } from "@/config/env";
 
 
-const apiBaseUrl = env.NEXT_PUBLIC_SHALLWE_API_BASE_URL || '';
+const apiBaseUrl = env.NEXT_PUBLIC_SHALLWE_API_BASE_URL_SERVER || '';
+const apiBaseUrlPublic = env.NEXT_PUBLIC_SHALLWE_API_BASE_URL_CLIENT || '';
 const skipMiddleware = env.NEXT_PUBLIC_SHALLWE_SKIP_MIDDLEWARE === 'true';
 
 
@@ -18,7 +19,7 @@ export async function middleware(request: NextRequest) {
     // Check if the URL starts with /admin
     if (url.pathname.startsWith('/admin')) {
     // Update hostname and port based on the environment variable
-    const apiUrl = new URL(apiBaseUrl);
+    const apiUrl = new URL(apiBaseUrlPublic);
 
     url.hostname = apiUrl.hostname;
     url.port = apiUrl.port;
