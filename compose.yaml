@@ -11,7 +11,7 @@ services:
 
   backend:
     image: shallwe-backend:latest
-    env_file: [ .env ]
+    env_file: [ .env, .env.local ]
     environment:
       # ---- globals ----
       <<: *global-env

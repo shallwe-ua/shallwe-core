@@ -19,7 +19,7 @@ x-frontend-base: &frontend-base
     - ./mock_frontend/shallwe:/app      # mount code for hot reload
     - /app/node_modules                 # separate container's node_modules from host to avoid mutual overrides
     - mock_build:/app/.next             # ^ same
-  env_file: [ .env ]
+  env_file: [ .env, .env.local ]
   environment:
     NEXT_PUBLIC_SHALLWE_ENV_MODE: ${NEXT_PUBLIC_SHALLWE_ENV_MODE:?}
     NEXT_PUBLIC_SHALLWE_OAUTH_CLIENT_ID: ${NEXT_PUBLIC_SHALLWE_OAUTH_CLIENT_ID:?}
@@ -38,7 +38,7 @@ services:
     image: postgres:16.9-alpine
     volumes:
       - db_data:/var/lib/postgresql/data
-    env_file: [ .env ]
+    env_file: [ .env, .env.local ]
     environment:
       POSTGRES_USER: ${SHALLWE_BACKEND_DB_USER:?}
       POSTGRES_PASSWORD: ${SHALLWE_BACKEND_DB_PASS:?}
