@@ -5,7 +5,7 @@ FROM python:${PYTHON_VERSION}-slim
 
 # Prevent Python stdout/stderr buffering
 ENV PYTHONUNBUFFERED=1
-# Prevents Python from writing pyc files
+# Prevent Python from writing pyc files
 ENV PYTHONDONTWRITEBYTECODE=1
 
 WORKDIR /app
