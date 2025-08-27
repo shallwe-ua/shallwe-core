@@ -3,7 +3,7 @@ import Cookies from 'js-cookie';
 import { env } from "@/config/env";
 
 
-const apiBaseUrl = env.NEXT_PUBLIC_SHALLWE_API_BASE_URL_CLIENT || '';
+const apiBaseUrl = env.NEXT_PUBLIC_SHALLWE_API_BASE_URL_EXTERNAL || '';
 
 
 const LogoutButton = () => {

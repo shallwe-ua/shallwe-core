@@ -5,7 +5,7 @@ import PageWithBigText from './components/PageWithBigText';
 import { env } from "@/config/env";
 
 
-const baseUrl = env.NEXT_PUBLIC_SHALLWE_API_BASE_URL_CLIENT || '';
+const baseUrl = env.NEXT_PUBLIC_SHALLWE_API_BASE_URL_EXTERNAL || '';
 const redirectURI = env.NEXT_PUBLIC_SHALLWE_OAUTH_REDIRECT_URI;
 const googleClientID = env.NEXT_PUBLIC_SHALLWE_OAUTH_CLIENT_ID;
 
