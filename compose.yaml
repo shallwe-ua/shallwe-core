@@ -1,4 +1,3 @@
-# in dev/qa mock frontend runs with backend, some vars are shared
 x-global-env: &global-env
   SHALLWE_GLOBAL_SITE_URL: ${SHALLWE_GLOBAL_SITE_URL:?}
   SHALLWE_GLOBAL_OAUTH_CLIENT_ID: ${SHALLWE_GLOBAL_OAUTH_CLIENT_ID:?}
