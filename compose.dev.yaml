@@ -7,7 +7,7 @@
 # - mock-run: backend and frontend running build*
 # - *mock-builder: build mock frontend for mock-run (preserved)
 
-# run with: docker compose -f compose.yaml -f compose.dev.yaml -f compose.manual.yaml up
+# run with: docker compose -f compose.yaml -f compose.dev.yaml --profile [[profile]] up
 # (omit "-f compose.yaml" base part if using mock-only - not needed)
 
 
