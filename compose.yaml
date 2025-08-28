@@ -10,7 +10,7 @@ x-global-env: &global-env
 services:
 
   backend:
-    image: shallwe-backend:latest
+    image: ${SHALLWE_GLOBAL_DOCKER_REGISTRY_URL}/backend:latest
     env_file:
       - path: .env
         required: false
