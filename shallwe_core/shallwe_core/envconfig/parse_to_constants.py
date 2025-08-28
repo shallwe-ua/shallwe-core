@@ -6,8 +6,8 @@ EnvSettings model. This allows us to import them directly (e.g. via
 and IDE autocompletion without manual duplication.
 
 Usage:
-    # From your project root, run:
-    python parse_to_constants.py [path]
+    # From envconfig dir, run:
+    python3 parse_to_constants.py [path]
 
     # This will create or overwrite `envconstants.py` in the same directory if no path
     # or at the given path, with contents like:
