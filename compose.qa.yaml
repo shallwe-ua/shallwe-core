@@ -2,7 +2,7 @@
 # profiles (scenarios):
 #
 # - local: for testing QA setup locally, spins up local db, otherwise same
-# - aws: for QA in AWS, db handled externally
+# - cloud: for QA in AWS, db handled externally
 # - *mock-builder: build mock frontend artifacts
 
 # run with: docker compose -f compose.yaml -f compose.qa.yaml --profile [[profile]] up
@@ -46,7 +46,7 @@ services:
       - "8080:80"  # prevents from clashing with host nginx if running
     profiles:
       - local
-      - public
+      - cloud
 
 
   # spin up db if local
@@ -90,7 +90,7 @@ services:
       SHALLWE_BACKEND_DB_HOST: db       # override to talk to db container
     profiles:
       - local
-      - public
+      - cloud
 
 
   # mock frontend:
@@ -109,7 +109,7 @@ services:
       - backend
     profiles:
       - local
-      - public
+      - cloud
 
 
 volumes:
