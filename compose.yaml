@@ -43,5 +43,4 @@ services:
       TF_CPP_MIN_LOG_LEVEL: ${TF_CPP_MIN_LOG_LEVEL:-3}
     ports:
       - "8000:8000"
-    entrypoint: ["/app/entrypoint.sh"]
     restart: on-failure
