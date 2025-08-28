@@ -32,6 +32,6 @@ RUN --mount=type=cache,target=/root/.cache/pypoetry \
 COPY . .
 
 # Make the entrypoint script executable
-RUN chmod +x /entrypoint.sh
+RUN chmod +x entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]
