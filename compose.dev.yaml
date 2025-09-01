@@ -78,6 +78,8 @@ services:
         condition: service_healthy
     environment:
       SHALLWE_BACKEND_DB_HOST: db       # override to talk to db container
+    ports:
+      - "8000:8000"
     profiles:
       - mock-dev
       - mock-run

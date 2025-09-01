@@ -12,7 +12,6 @@
 x-frontend-base: &frontend-base
   image: ${SHALLWE_GLOBAL_DOCKER_REGISTRY_URL}/mock-frontend:latest
   volumes:
-    - ./mock_frontend/shallwe:/app      # mount code for hot reload
     - /app/node_modules                 # separate container's node_modules from host to avoid mutual overrides
     - mock_build:/app/.next             # ^ same
   env_file:
@@ -27,8 +26,8 @@ x-frontend-base: &frontend-base
     NEXT_PUBLIC_SHALLWE_API_BASE_URL_EXTERNAL: ${NEXT_PUBLIC_SHALLWE_API_BASE_URL_EXTERNAL}
     NEXT_PUBLIC_SHALLWE_API_BASE_URL_INTERNAL: http://backend:8000
     NEXT_PUBLIC_SHALLWE_SKIP_MIDDLEWARE: ${NEXT_PUBLIC_SHALLWE_SKIP_MIDDLEWARE:?}
-  ports:
-    - "3000:3000"
+  expose:
+    - "3000"
 
 
 services:
@@ -78,7 +77,6 @@ services:
     build:
       context: ./shallwe_core           # builds locally
     volumes:
-      - ./shallwe_core:/app             # mount code for hot reload
       - staticfiles:/app/staticfiles    # separate container's static from host to avoid mutual overrides
       - media:/app/media                # ^ same
       - django_logs:/tmp/django         # persistent logs for debug
