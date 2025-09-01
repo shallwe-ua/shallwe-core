@@ -30,3 +30,8 @@ _Note: you can also use docker files and entrypoints as instructions for local r
 - Deploy and run in AWS
 
 There is no strict timeline for this, since it's used as a sandbox of relatively complex codebase to experiment with technology I want to gain a better grasp of.
+
+---
+☝️ **Project limitations**:
+- No money for EKS, so not using Kubernetes. Docker Compose will be used for first deployments and Swarm later.
+- Similarly, no money for ECS. GitLab storage gives enough free space for this project, so it's used instead.
