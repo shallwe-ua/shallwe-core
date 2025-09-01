@@ -28,7 +28,7 @@ prepare_backend() {
     echo "[entrypoint] ⚠ Superuser not created — already exists or something else went wrong. Skipping"
   fi
 
-  # Collect static files if not dev env or debug is off
+  # Collect static files if not dev
   if [ "${HSALLWE_GLOBAL_ENV_MODE}" != "DEV" ]; then
     $MANAGEPY collectstatic --noinput
   fi
