@@ -3,7 +3,7 @@
 FROM nginx:alpine
 
 # Install envsubst (part of gettext for using template env vars)
-RUN apk add --no-cache gettext
+RUN apk add --no-cache gettext bash
 
 # Copy template and entrypoint (for variable placement)
 COPY default.conf.template /etc/nginx/templates/default.conf.template
