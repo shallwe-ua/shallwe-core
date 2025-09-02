@@ -19,6 +19,15 @@ server {
         proxy_set_header X-Forwarded-Proto $scheme;
     }
 
+    # Serve Adminpanel requests at /admin/
+    location /admin/ {
+        proxy_pass ${NEXT_PUBLIC_SHALLWE_API_BASE_URL_INTERNAL};
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
     location /static/ {
         proxy_pass ${NEXT_PUBLIC_SHALLWE_API_BASE_URL_INTERNAL}/static/;
     }
