@@ -36,10 +36,20 @@ services:
   nginx:
     image: ${SHALLWE_GLOBAL_DOCKER_REGISTRY_URL:?}/nginx:latest
     volumes:
-      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./nginx/default.conf.template:/etc/nginx/templates/default.conf.template:ro
+      - staticfiles:/app/staticfiles    # static volume for shared access with backend
+      - media:/app/media                # ^ same for media
+    env_file:
+      - path: .env
+        required: false
+      - path: .env.local
+        required: false
     depends_on:
       - backend
       - frontend-run
+    environment:
+      SHALLWE_GLOBAL_SITE_URL_INTERNAL: http://frontend-run:3000
+      NEXT_PUBLIC_SHALLWE_API_BASE_URL_INTERNAL: http://backend:8000
     ports:
       - "8080:80"  # prevents from clashing with host nginx if running
     profiles:
@@ -74,11 +84,9 @@ services:
 
   # backend overrides for qa
   backend:
-    build:
-      context: ./shallwe_core           # builds locally
     volumes:
-      - staticfiles:/app/staticfiles    # separate container's static from host to avoid mutual overrides
-      - media:/app/media                # ^ same
+      - staticfiles:/app/staticfiles    # static volume for shared access with nginx
+      - media:/app/media                # ^ same for media
       - django_logs:/tmp/django         # persistent logs for debug
     depends_on:
       db:
