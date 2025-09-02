@@ -29,10 +29,10 @@ server {
     }
 
     location /static/ {
-        proxy_pass ${NEXT_PUBLIC_SHALLWE_API_BASE_URL_INTERNAL}/static/;
+        alias /app/staticfiles/;
     }
 
     location /media/ {
-        proxy_pass ${NEXT_PUBLIC_SHALLWE_API_BASE_URL_INTERNAL}/media/;
+        alias /app/media/;
     }
 }
