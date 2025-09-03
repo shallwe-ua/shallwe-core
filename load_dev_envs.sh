@@ -1,9 +1,14 @@
 #!/usr/bin/env bash
 
-# This script is safely loading and applying DEV config values and secrets from a Bitwarden storage.
+# This script is safely loading and applying LOCAL config values and secrets from a Bitwarden storage.
+# You can choose the stack (dev, qa-local or some your-stack) by passing it as the first argument, e.g.:
+#   ./load_env_from_bw.sh dev
+#   ./load_env_from_bw.sh qa-local
 # It is NOT intended to be invoked on cloud - for cloud runs use cloud-native env-injection solutions.
 # If you need to override some values, use .env.local alongside and DO NOT commit it.
-# For more info on env variables being loaded see .env.example or shallwe/dev Bitwarden vault.
+# For more info on env variables being loaded see .env.example or shallwe/<stack> Bitwarden vault.
+
+# WARNING: you will have to re-login if you add a new vault item (stack) - otherwise it'll be Not Found.
 
 # --------- Check dependencies ---------
 echo "🔐 Checking script dependencies..."
@@ -66,8 +71,11 @@ TMP=".env.tmp"
 : > "$TMP"
 echo "# Generated .env by load_dev_env_from_bw.sh — DO NOT COMMIT" >> "$TMP"
 
-# Fetch from Bitwarden
-bw get item shallwe/dev --raw \
+# Fetch dev or qa-local env vars from Bitwarden
+STACK=${1:-dev}  # default to dev if no argument provided
+echo "📦 Fetching $STACK config from Bitwarden..."
+
+bw get item "shallwe/$STACK" --raw \
   | jq -r '.fields[]
       | if .value == null
         then "\(.name)="
