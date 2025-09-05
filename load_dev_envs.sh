@@ -69,7 +69,7 @@ echo "📦 Fetching dev config from Bitwarden..."
 # Make temporary file for .env generation
 TMP=".env.tmp"
 : > "$TMP"
-echo "# Generated .env by load_dev_env_from_bw.sh — DO NOT COMMIT" >> "$TMP"
+echo "# Generated .env by load_dev_envs.sh — DO NOT COMMIT" >> "$TMP"
 
 # Fetch dev or qa-local env vars from Bitwarden
 STACK=${1:-dev}  # default to dev if no argument provided
