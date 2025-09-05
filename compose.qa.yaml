@@ -10,7 +10,7 @@
 
 # base mock frontend, for reuse in several scenarios
 x-frontend-base: &frontend-base
-  image: ${SHALLWE_GLOBAL_DOCKER_REGISTRY_URL:?}/mock-frontend:latest
+  image: ${SHALLWE_GLOBAL_DOCKER_REGISTRY_URL}mock-frontend:${SHALLWE_GLOBAL_DOCKER_FRONTEND_IMAGE_TAG:?}
   volumes:
     - /app/node_modules                 # separate container's node_modules from host to avoid mutual overrides
     - mock_build:/app/.next             # ^ same
@@ -34,7 +34,7 @@ services:
 
   # nginx setup
   nginx:
-    image: ${SHALLWE_GLOBAL_DOCKER_REGISTRY_URL:?}/nginx:latest
+    image: ${SHALLWE_GLOBAL_DOCKER_REGISTRY_URL}nginx:${SHALLWE_GLOBAL_DOCKER_NGINX_IMAGE_TAG:?}
     volumes:
       - ./nginx/default.conf.template:/etc/nginx/templates/default.conf.template:ro
       - staticfiles:/app/staticfiles    # static volume for shared access with backend
