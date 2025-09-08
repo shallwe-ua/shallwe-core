@@ -33,5 +33,6 @@ There is no strict timeline for this, since it's used as a sandbox of relatively
 
 ---
 ☝️ **Project limitations**:
-- No money for EKS, so not using Kubernetes. Docker Compose will be used for first deployments and Swarm later.
-- Similarly, no money for ECS. GitLab storage gives enough free space for this project, so it's used instead.
+- No money for EKS, so not using Kubernetes at all. Maybe ECS for Backend.
+- Similarly, no money for ECR. GitLab storage gives enough free space for this project, so it's used instead.
+- Similarly, no money for anything beyond one micro EC2 instance, so Next.js deployment goes to Vercel.
