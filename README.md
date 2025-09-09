@@ -27,7 +27,7 @@ _Note: you can also use docker files and entrypoints as instructions for local r
 - Add full documentation
 - Add logging
 - Provide a minimal demo frontend covering all features (⚠️ *not* `mock_frontend`, which is only for the most basic manual tests)  
-- Deploy and run in AWS
+- Deploy and run in AWS (or an affordable cloud alternative)
 
 There is no strict timeline for this, since it's used as a sandbox of relatively complex codebase to experiment with technology I want to gain a better grasp of.
 
@@ -35,4 +35,4 @@ There is no strict timeline for this, since it's used as a sandbox of relatively
 ☝️ **Project limitations**:
 - No money for EKS, so not using Kubernetes at all. Maybe ECS for Backend.
 - Similarly, no money for ECR. GitLab storage gives enough free space for this project, so it's used instead.
-- Similarly, no money for anything beyond one micro EC2 instance, so Next.js deployment goes to Vercel.
+- Similarly, no money for anything beyond one EC2 Free-tier instance, so Next.js deployment goes to Vercel.
