@@ -36,3 +36,4 @@ There is no strict timeline for this, since it's used as a sandbox of relatively
 - No money for EKS, so not using Kubernetes at all. Maybe ECS for Backend.
 - Similarly, no money for ECR. GitLab storage gives enough free space for this project, so it's used instead.
 - Similarly, no money for anything beyond one EC2 Free-tier instance, so Next.js deployment goes to Vercel.
+- No money for Secrets Manager. Using hacks and workarounds.
