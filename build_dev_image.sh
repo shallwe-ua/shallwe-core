@@ -90,7 +90,13 @@ fi
 mv "$TEMP_FILE" .env
 
 # Build image (don't push)
-docker build -t "$IMAGE_NAME:$IMAGE_TAG" "$SOURCE_PATH"
+if [ "$SERVICE" = "b" ]; then
+    # For the backend, pass the DeepFace models env var as a build arg
+    docker build --build-arg SHALLWE_BACKEND_DEEPFACE_MODELS -t "$IMAGE_NAME:$IMAGE_TAG" "$SOURCE_PATH"
+else
+    # For other services, build normally
+    docker build -t "$IMAGE_NAME:$IMAGE_TAG" "$SOURCE_PATH"
+fi
 echo "Built locally: $IMAGE_NAME:$IMAGE_TAG from $SOURCE_PATH"
 echo "Updated .env with $ENV_VAR_NAME=$IMAGE_TAG"
 

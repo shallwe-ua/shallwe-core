@@ -10,7 +10,7 @@ from shallwe_util.efficiency import time_measure
 
 
 def check_face(image_path):
-    backends = ['ssd', 'mtcnn', 'retinaface']
+    backends = settings.SHALLWE_BACKEND_DEEPFACE_MODELS
 
     results = []
     for backend in backends:
