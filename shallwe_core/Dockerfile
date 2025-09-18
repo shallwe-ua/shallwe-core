@@ -31,6 +31,11 @@ RUN --mount=type=cache,target=/root/.cache/pypoetry \
 # Copy application code
 COPY . .
 
+# Download deepface model backends (use --build-arg SHALLWE_BACKEND_DEEPFACE_MODELS to pull from env)
+ARG SHALLWE_BACKEND_DEEPFACE_MODELS
+RUN chmod +x /app/shallwe_photo/scripts/prefetch_deepface_models.py \
+    && python3 /app/shallwe_photo/scripts/prefetch_deepface_models.py
+
 # Make the entrypoint script executable
 RUN chmod +x entrypoint.sh
 
