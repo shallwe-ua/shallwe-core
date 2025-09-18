@@ -11,7 +11,7 @@ server {
     }
 
     # Serve API requests at /api/
-    location /api/ {
+    location /api {
         proxy_pass ${NEXT_PUBLIC_SHALLWE_API_BASE_URL_INTERNAL};
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
@@ -20,7 +20,7 @@ server {
     }
 
     # Serve Adminpanel requests at /admin/
-    location /admin/ {
+    location /admin {
         proxy_pass ${NEXT_PUBLIC_SHALLWE_API_BASE_URL_INTERNAL};
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
@@ -28,11 +28,11 @@ server {
         proxy_set_header X-Forwarded-Proto $scheme;
     }
 
-    location /static/ {
+    location /static {
         alias /app/staticfiles/;
     }
 
-    location /media/ {
+    location /media {
         alias /app/media/;
     }
 }
