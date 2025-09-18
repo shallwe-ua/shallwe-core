@@ -180,12 +180,6 @@ LOGGING = {
         },
     },
     "handlers": {
-        "file": {
-            "level": "INFO",
-            "class": "logging.FileHandler",
-            "filename": "/tmp/django/info.log",
-            "formatter": "verbose",
-        },
         "console": {
             "level": "INFO",
             "class": "logging.StreamHandler",
@@ -194,7 +188,7 @@ LOGGING = {
     },
     "loggers": {
         "django": {
-            "handlers": ["file", "console"],
+            "handlers": ["console"],
             "level": "INFO",
             "propagate": True,
         },
@@ -253,3 +247,16 @@ if SHALLWE_GLOBAL_ENV_MODE != 'DEV':
     CSRF_COOKIE_SAMESITE = None
     CSRF_COOKIE_SECURE = True
     CSRF_COOKIE_DOMAIN = SHALLWE_BACKEND_CREDENTIALS_COOKIE_DOMAIN
+
+# Logs
+if SHALLWE_GLOBAL_ENV_MODE == 'DEV':
+    import os
+    os.makedirs('/tmp/django', exist_ok=True)
+
+    LOGGING['handlers']['file'] = {
+        "level": "INFO",
+        "class": "logging.FileHandler",
+        "filename": "/tmp/django/info.log",
+        "formatter": "verbose",
+    }
+    LOGGING['loggers']['django']['handlers'] += ["file"]
