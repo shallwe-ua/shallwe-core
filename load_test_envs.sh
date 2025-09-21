@@ -69,7 +69,7 @@ echo "📦 Fetching dev config from Bitwarden..."
 # Make temporary file for .env generation
 TMP=".env.tmp"
 : > "$TMP"
-echo "# Generated .env by load_dev_envs.sh — DO NOT COMMIT" >> "$TMP"
+echo "# Generated .env by $(basename "${BASH_SOURCE[0]}") — DO NOT COMMIT" >> "$TMP"
 
 # Fetch dev or qa-local env vars from Bitwarden
 STACK=${1:-dev}  # default to dev if no argument provided
@@ -121,24 +121,5 @@ mv "$TMP" .env
 
 
 # -------- Apply immediately if possible ---------
-# If autoenv is present - try applying
-if command -v autoenv_init > /dev/null; then
-  if [[ -f .env ]]; then
-    echo "📦 Detected .env file, triggering autoenv by re-entering directory...."
-    cd .
-  else
-    echo "⚠️ Autoenv detected but no .env file found."
-  fi
-
-# No autoenv – try sourcing .env manually
-else
-  if [[ "${BASH_SOURCE[0]}" != "${0}" ]]; then
-    echo "🪄 Applying .env variables to current shell..."
-    echo "Hint: install autoenv to automate this step."
-    set -a
-    source .env 2>/dev/null && echo "✅ .env loaded." || echo "⚠️ No .env file found."
-    set +a
-  else
-    echo "ℹ️  .env updated. To apply changes: run 'source .env'"
-  fi
-fi
+source ./dev_utils/env_apply.sh
+apply_env_file
