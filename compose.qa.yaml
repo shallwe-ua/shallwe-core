@@ -1,85 +1,22 @@
-# the file contains several profiles for running tests with NGINX either locally or in AWS
+# the file contains a full setup for local QA run with NGINX
 # profiles (scenarios):
 #
-# - local: for testing QA setup locally, spins up local db, otherwise same
-# - cloud: for QA in AWS, db handled externally
-# - *mock-builder: build mock frontend artifacts
-
-# run with: docker compose -f compose.yaml -f compose.qa.yaml --profile [[profile]] up
-
-
-# base mock frontend, for reuse in several scenarios
-x-frontend-base: &frontend-base
-  image: ${SHALLWE_GLOBAL_DOCKER_REGISTRY_URL}mock-frontend:${SHALLWE_GLOBAL_DOCKER_FRONTEND_IMAGE_TAG:?}
-  volumes:
-    - /app/node_modules                 # separate container's node_modules from host to avoid mutual overrides
-    - mock_build:/app/.next             # ^ same
-  env_file:
-    - path: .env
-      required: false
-    - path: .env.local
-      required: false
-  environment:
-    NEXT_PUBLIC_SHALLWE_ENV_MODE: ${NEXT_PUBLIC_SHALLWE_ENV_MODE:?}
-    NEXT_PUBLIC_SHALLWE_OAUTH_CLIENT_ID: ${NEXT_PUBLIC_SHALLWE_OAUTH_CLIENT_ID:?}
-    NEXT_PUBLIC_SHALLWE_OAUTH_REDIRECT_URI: ${NEXT_PUBLIC_SHALLWE_OAUTH_REDIRECT_URI:?}
-    NEXT_PUBLIC_SHALLWE_API_BASE_URL_EXTERNAL: ${NEXT_PUBLIC_SHALLWE_API_BASE_URL_EXTERNAL}
-    NEXT_PUBLIC_SHALLWE_API_BASE_URL_INTERNAL: http://backend:8000
-    NEXT_PUBLIC_SHALLWE_SKIP_MIDDLEWARE: ${NEXT_PUBLIC_SHALLWE_SKIP_MIDDLEWARE:?}
-  expose:
-    - "3000"
+# - qa: full run imitating prod setup (pulled prod images, no hot reload, nginx)
+#
+# run with: docker compose -f compose.base.yaml -f compose.qa.yaml --profile [[profile]] up
 
 
 services:
 
-  # nginx setup
+  # include nginx
   nginx:
-    image: ${SHALLWE_GLOBAL_DOCKER_REGISTRY_URL}nginx:${SHALLWE_GLOBAL_DOCKER_NGINX_IMAGE_TAG:?}
-    volumes:
-      - ./nginx/default.conf.template:/etc/nginx/templates/default.conf.template:ro
-      - staticfiles:/app/staticfiles    # static volume for shared access with backend
-      - media:/app/media                # ^ same for media
-    env_file:
-      - path: .env
-        required: false
-      - path: .env.local
-        required: false
-    depends_on:
-      - backend
-      - frontend-run
-    environment:
-      SHALLWE_GLOBAL_SITE_URL_INTERNAL: http://frontend-run:3000
-      NEXT_PUBLIC_SHALLWE_API_BASE_URL_INTERNAL: http://backend:8000
-    ports:
-      - "8080:80"  # prevents from clashing with host nginx if running
     profiles:
-      - local
-      - cloud
+      - qa
 
-
-  # spin up db if local
+  # include db
   db:
-    image: postgres:16.9-alpine
-    volumes:
-      - db_data:/var/lib/postgresql/data
-    env_file:
-      - path: .env
-        required: false
-      - path: .env.local
-        required: false
-    environment:
-      POSTGRES_USER: ${SHALLWE_BACKEND_DB_USER:?}
-      POSTGRES_PASSWORD: ${SHALLWE_BACKEND_DB_PASS:?}
-      POSTGRES_DB: ${SHALLWE_BACKEND_DB_NAME:?}
-    ports:
-      - "5434:${SHALLWE_BACKEND_DB_PORT}"
-    healthcheck:
-      test: [ "CMD", "pg_isready", "-U", "${SHALLWE_BACKEND_DB_USER}" ]
-      interval: 5s
-      retries: 5
-    restart: always
     profiles:
-      - local
+      - qa
 
 
   # backend overrides for qa
@@ -88,38 +25,16 @@ services:
       - staticfiles:/app/staticfiles    # static volume for shared access with nginx
       - media:/app/media                # ^ same for media
       - django_logs:/tmp/django         # persistent logs for debug
-    depends_on:
-      db:
-        condition: service_healthy
     environment:
       SHALLWE_BACKEND_DB_HOST: db       # override to talk to db container
     profiles:
-      - local
-      - cloud
+      - qa
 
 
-  # mock frontend:
-  # step 1. build artifacts (once after change)
-  frontend-builder:
-    <<: *frontend-base
-    command: npm run build
-    profiles:
-      - mock-builder
-
-  # step 2. run a preserved build
-  frontend-run:
-    <<: *frontend-base
-    command: npm run start
+  # run a preserved frontend build
+  frontend:
+    command: node server.js
     depends_on:
       - backend
     profiles:
-      - local
-      - cloud
-
-
-volumes:
-  db_data:
-  media:
-  staticfiles:
-  django_logs:
-  mock_build:
+      - qa

@@ -1,78 +1,43 @@
-# the file contains several profiles for running either separate frontend, backend or combination
+# the file contains several test profiles for running either separate frontend, backend or combination
 # profiles (scenarios):
 #
-# - api-only: backend only, no frontend
-# - mock-only: frontend only, no backend
-# - mock-dev: backend and frontend dev mode
-# - mock-run: backend and frontend running build*
-# - *mock-builder: build mock frontend for mock-run (preserved)
-
-# run with: docker compose -f compose.yaml -f compose.dev.yaml --profile [[profile]] up
-# (omit "-f compose.yaml" base part if using mock-only - not needed)
+# - api-only: backend only (hot reload, dev run), no frontend
+# - mock-only: frontend only (hot reload, dev run), no backend
+# - mock-dev: backend (hot reload, dev run) and frontend (hot reload, dev run)
+# - mock-prod: backend (hot reload, dev run) and frontend (build, prod run)
+#
+# run with: docker compose -f compose.base.yaml -f compose.dev.yaml --profile [[profile]] up
 
 
-# base mock frontend, for reuse in several scenarios
-x-frontend-base: &frontend-base
+x-extend-frontend: &extend-frontend
+  extends:
+    file: compose.base.yaml
+    service: frontend
+    volumes:
+      - /app/node_modules               # anonymous volume to avoid overrides in host
+      - /app/.next                      # anonymous volume to avoid overrides in host
   build:
     context: ./mock_frontend/shallwe
-  volumes:
-    - ./mock_frontend/shallwe:/app      # mount code for hot reload
-    - /app/node_modules                 # separate container's node_modules from host to avoid mutual overrides
-    - mock_build:/app/.next             # ^ same
-  env_file:
-    - path: .env
-      required: false
-    - path: .env.local
-      required: false
-  environment:
-    NEXT_PUBLIC_SHALLWE_ENV_MODE: ${NEXT_PUBLIC_SHALLWE_ENV_MODE:?}
-    NEXT_PUBLIC_SHALLWE_OAUTH_CLIENT_ID: ${NEXT_PUBLIC_SHALLWE_OAUTH_CLIENT_ID:?}
-    NEXT_PUBLIC_SHALLWE_OAUTH_REDIRECT_URI: ${NEXT_PUBLIC_SHALLWE_OAUTH_REDIRECT_URI:?}
-    NEXT_PUBLIC_SHALLWE_API_BASE_URL_EXTERNAL: ${NEXT_PUBLIC_SHALLWE_API_BASE_URL_EXTERNAL}
-    NEXT_PUBLIC_SHALLWE_API_BASE_URL_INTERNAL: http://backend:8000
-    NEXT_PUBLIC_SHALLWE_SKIP_MIDDLEWARE: ${NEXT_PUBLIC_SHALLWE_SKIP_MIDDLEWARE:?}
   ports:
     - "3000:3000"
 
 
 services:
 
-  # spin up local db (except mock-only)
+  # include db (except mock-only)
   db:
-    image: postgres:16.9-alpine
-    volumes:
-      - db_data:/var/lib/postgresql/data
-    env_file:
-      - path: .env
-        required: false
-      - path: .env.local
-        required: false
-    environment:
-      POSTGRES_USER: ${SHALLWE_BACKEND_DB_USER:?}
-      POSTGRES_PASSWORD: ${SHALLWE_BACKEND_DB_PASS:?}
-      POSTGRES_DB: ${SHALLWE_BACKEND_DB_NAME:?}
-    ports:
-      - "5434:${SHALLWE_BACKEND_DB_PORT}"
-    healthcheck:
-      test: [ "CMD", "pg_isready", "-U", "${SHALLWE_BACKEND_DB_USER}" ]
-      interval: 5s
-      retries: 5
-    restart: always
     profiles:
       - mock-dev
-      - mock-run
+      - mock-prod
       - api-only
 
 
   # backend overrides for local build and db (except mock-only)
   backend:
     build:
-      context: ./shallwe_core           # builds locally
+      context: ./shallwe_core
     volumes:
       - ./shallwe_core:/app             # mount code for hot reload
-      - staticfiles:/app/staticfiles    # separate container's static from host to avoid mutual overrides
-      - media:/app/media                # ^ same
-      - django_logs:/tmp/django         # persistent logs for debug
     depends_on:
       db:
         condition: service_healthy
@@ -82,48 +47,42 @@ services:
       - "8000:8000"
     profiles:
       - mock-dev
-      - mock-run
+      - mock-prod
       - api-only
 
 
   # mock frontend scenarios:
   # 1) use mock only (no backend)
   frontend-noapi:
-    <<: *frontend-base
+    <<: *extend-frontend
+    build:
+      target: dev
+    volumes:
+      - ./mock_frontend/shallwe:/app     # mount code for hot reload
     command: npm run dev:mock
     profiles:
       - mock-only
 
-  # 2) use mock in dev mode
+  # 2) use mock in dev mode with backend
   frontend-dev:
-    <<: *frontend-base
+    <<: *extend-frontend
+    build:
+      target: dev
+    volumes:
+      - ./mock_frontend/shallwe:/app     # mount code for hot reload
     command: npm run dev
     depends_on:
       - backend
     profiles:
       - mock-dev
 
-  # 3) use mock build
-  # step 1. build artifacts (once after change)
-  frontend-builder:
-    <<: *frontend-base
-    command: npm run build
-    profiles:
-      - mock-builder
-
-  # step 2. run a preserved build
-  frontend-run:
-    <<: *frontend-base
-    command: npm run start
+  # 3) run the prod build with backend
+  frontend-prod:
+    <<: *extend-frontend
+    build:
+      target: prod
+    command: node server.js
     depends_on:
       - backend
     profiles:
-      - mock-run
-
-
-volumes:
-  db_data:
-  media:
-  staticfiles:
-  django_logs:
-  mock_build:
+      - mock-prod
