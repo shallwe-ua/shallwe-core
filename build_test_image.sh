@@ -31,16 +31,25 @@ case $SERVICE in
         SERVICE_NAME="FRONTEND"
         IMAGE_NAME="mock-frontend"
         SOURCE_PATH="./mock_frontend/shallwe/"
+        BUILD_PARAMS="--target prod \
+         --build-arg NEXT_PUBLIC_SHALLWE_ENV_MODE \
+         --build-arg NEXT_PUBLIC_SHALLWE_OAUTH_CLIENT_ID \
+         --build-arg NEXT_PUBLIC_SHALLWE_OAUTH_REDIRECT_URI \
+         --build-arg NEXT_PUBLIC_SHALLWE_API_BASE_URL_EXTERNAL \
+         --build-arg NEXT_PUBLIC_SHALLWE_API_BASE_URL_INTERNAL \
+         --build-arg NEXT_PUBLIC_SHALLWE_SKIP_MIDDLEWARE"
         ;;
     b)
         SERVICE_NAME="BACKEND"
         IMAGE_NAME="backend"
         SOURCE_PATH="./shallwe_core/"
+        BUILD_PARAMS="--build-arg SHALLWE_BACKEND_DEEPFACE_MODELS"
         ;;
     n)
         SERVICE_NAME="NGINX"
         IMAGE_NAME="nginx"
         SOURCE_PATH="./nginx/"
+        BUILD_PARAMS=""
         ;;
     *)
         echo "Invalid service. Use: f (frontend), b (backend), n (nginx)"
@@ -67,6 +76,14 @@ if [ -n "$PREV_TAG" ]; then
     NEW_VALUE_LINE="$NEW_VALUE_LINE    # Previous: $PREV_TAG"  # Add previous tag as side-comment if any
 fi
 
+# Build image (don't push)
+if ! docker build $BUILD_PARAMS -t "$IMAGE_NAME:$IMAGE_TAG" "$SOURCE_PATH"; then
+    echo "Build failed for $IMAGE_NAME:$IMAGE_TAG from $SOURCE_PATH" >&2
+    echo "Script aborted due to build failure" >&2
+    return 1 2>/dev/null
+fi
+echo "Built locally: $IMAGE_NAME:$IMAGE_TAG from $SOURCE_PATH"
+
 # Update .env file preserving existing content and order
 TEMP_FILE=$(mktemp)
 LINE_FOUND=false
@@ -89,15 +106,6 @@ fi
 
 mv "$TEMP_FILE" .env
 
-# Build image (don't push)
-if [ "$SERVICE" = "b" ]; then
-    # For the backend, pass the DeepFace models env var as a build arg
-    docker build --build-arg SHALLWE_BACKEND_DEEPFACE_MODELS -t "$IMAGE_NAME:$IMAGE_TAG" "$SOURCE_PATH"
-else
-    # For other services, build normally
-    docker build -t "$IMAGE_NAME:$IMAGE_TAG" "$SOURCE_PATH"
-fi
-echo "Built locally: $IMAGE_NAME:$IMAGE_TAG from $SOURCE_PATH"
 echo "Updated .env with $ENV_VAR_NAME=$IMAGE_TAG"
 
 # Cleanup old images if requested
@@ -125,25 +133,6 @@ if [ "$CLEANUP" = true ]; then
 fi
 
 
-# -------- Apply env var immediately if possible ---------
-# If autoenv is present - try applying
-if command -v autoenv_init > /dev/null; then
-  if [[ -f .env ]]; then
-    echo "📦 Detected .env file, triggering autoenv by re-entering directory...."
-    cd .
-  else
-    echo "⚠️ Autoenv detected but no .env file found."
-  fi
-
-# No autoenv – try sourcing .env manually
-else
-  if [[ "${BASH_SOURCE[0]}" != "${0}" ]]; then
-    echo "🪄 Applying .env variables to current shell..."
-    echo "Hint: install autoenv to automate this step."
-    set -a
-    source .env 2>/dev/null && echo "✅ .env loaded." || echo "⚠️ No .env file found."
-    set +a
-  else
-    echo "ℹ️  .env updated. To apply changes: run 'source .env'"
-  fi
-fi
+# -------- Apply env vars immediately if possible ---------
+source ./dev_utils/env_apply.sh
+apply_env_file
