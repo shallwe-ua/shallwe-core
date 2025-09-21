@@ -21,12 +21,14 @@ services:
 
   # backend overrides for qa
   backend:
+    image: ${SHALLWE_GLOBAL_DOCKER_REGISTRY_URL}backend:${SHALLWE_GLOBAL_DOCKER_BACKEND_IMAGE_TAG:?}
     profiles:
       - qa
 
 
   # run a preserved frontend build
   frontend:
+    image: ${SHALLWE_GLOBAL_DOCKER_REGISTRY_URL}mock-frontend:${SHALLWE_GLOBAL_DOCKER_FRONTEND_IMAGE_TAG:?}
     command: node server.js
     depends_on:
       - backend

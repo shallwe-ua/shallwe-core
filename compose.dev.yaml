@@ -13,9 +13,9 @@ x-extend-frontend: &extend-frontend
   extends:
     file: compose.base.yaml
     service: frontend
-    volumes:
-      - /app/node_modules               # anonymous volume to avoid overrides in host
-      - /app/.next                      # anonymous volume to avoid overrides in host
+  volumes:
+    - /app/node_modules               # anonymous volume to avoid overrides in host
+    - /app/.next                      # anonymous volume to avoid overrides in host
   ports:
     - "3000:3000"
 
