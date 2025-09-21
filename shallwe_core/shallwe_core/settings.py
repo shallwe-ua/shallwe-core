@@ -46,6 +46,7 @@ INSTALLED_APPS = [
 
 # ----- Requests settings -----
 MIDDLEWARE = [
+    'allow_cidr.middleware.AllowCIDRMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
@@ -58,6 +59,8 @@ MIDDLEWARE = [
 ]
 
 ALLOWED_HOSTS = [*SHALLWE_BACKEND_ALLOWED_HOSTS]
+
+ALLOWED_CIDR_NETS = [*SHALLWE_BACKEND_ALLOWED_CIDR_NETS]    # django-allow-cidr
 
 CSRF_TRUSTED_ORIGINS = [*SHALLWE_BACKEND_CSRF_TRUSTED_ORIGINS]
 

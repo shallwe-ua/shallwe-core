@@ -88,9 +88,10 @@ urllib3 = "2.1.0"
 werkzeug = "3.0.1"
 wrapt = "1.14.1"
 yarg = "0.1.9"
-django-nested-admin = "^4.1.1"
+django-nested-admin = "^4.1.4"
 pydantic = "^2.11.7"
 pydantic-settings = "^2.10.1"
+django-allow-cidr = "^0.8.0"
 
 [tool.poetry.group.dev.dependencies]
 django-extensions = "3.2.3"

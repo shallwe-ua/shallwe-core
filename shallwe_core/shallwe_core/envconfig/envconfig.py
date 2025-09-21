@@ -21,6 +21,7 @@ class EnvSettings(BaseSettings):
     SHALLWE_BACKEND_DB_HOST: str
     SHALLWE_BACKEND_DB_PORT: int
     SHALLWE_BACKEND_ALLOWED_HOSTS: Annotated[Tuple[str, ...], NoDecode]
+    SHALLWE_BACKEND_ALLOWED_CIDR_NETS: Annotated[Tuple[str, ...], NoDecode]
     SHALLWE_BACKEND_CSRF_TRUSTED_ORIGINS: Annotated[Tuple[str, ...], NoDecode]
     SHALLWE_BACKEND_CORS_ALLOWED_ORIGINS: Annotated[Tuple[str, ...], NoDecode]
     SHALLWE_BACKEND_CREDENTIALS_COOKIE_DOMAIN: Optional[str] = None
@@ -29,6 +30,7 @@ class EnvSettings(BaseSettings):
     # noinspection PyNestedDecorators
     @field_validator(
         "SHALLWE_BACKEND_ALLOWED_HOSTS",
+        "SHALLWE_BACKEND_ALLOWED_CIDR_NETS",
         "SHALLWE_BACKEND_CSRF_TRUSTED_ORIGINS",
         "SHALLWE_BACKEND_CORS_ALLOWED_ORIGINS",
         "SHALLWE_BACKEND_DEEPFACE_MODELS",
