@@ -16,17 +16,19 @@ x-extend-frontend: &extend-frontend
     volumes:
       - /app/node_modules               # anonymous volume to avoid overrides in host
       - /app/.next                      # anonymous volume to avoid overrides in host
-  build:
-    context: ./mock_frontend/shallwe
-    args:
-      NEXT_PUBLIC_SHALLWE_ENV_MODE: ${NEXT_PUBLIC_SHALLWE_ENV_MODE:?}
-      NEXT_PUBLIC_SHALLWE_OAUTH_CLIENT_ID: ${NEXT_PUBLIC_SHALLWE_OAUTH_CLIENT_ID:?}
-      NEXT_PUBLIC_SHALLWE_OAUTH_REDIRECT_URI: ${NEXT_PUBLIC_SHALLWE_OAUTH_REDIRECT_URI:?}
-      NEXT_PUBLIC_SHALLWE_API_BASE_URL_EXTERNAL: ${NEXT_PUBLIC_SHALLWE_API_BASE_URL_EXTERNAL:?}
-      NEXT_PUBLIC_SHALLWE_API_BASE_URL_INTERNAL: http://backend:8000
-      NEXT_PUBLIC_SHALLWE_SKIP_MIDDLEWARE: ${NEXT_PUBLIC_SHALLWE_SKIP_MIDDLEWARE:?}
   ports:
     - "3000:3000"
+
+
+x-frontend-build-context: &frontend-build-context
+  context: ./mock_frontend/shallwe
+  args:
+    NEXT_PUBLIC_SHALLWE_ENV_MODE: ${NEXT_PUBLIC_SHALLWE_ENV_MODE:?}
+    NEXT_PUBLIC_SHALLWE_OAUTH_CLIENT_ID: ${NEXT_PUBLIC_SHALLWE_OAUTH_CLIENT_ID:?}
+    NEXT_PUBLIC_SHALLWE_OAUTH_REDIRECT_URI: ${NEXT_PUBLIC_SHALLWE_OAUTH_REDIRECT_URI:?}
+    NEXT_PUBLIC_SHALLWE_API_BASE_URL_EXTERNAL: ${NEXT_PUBLIC_SHALLWE_API_BASE_URL_EXTERNAL:?}
+    NEXT_PUBLIC_SHALLWE_API_BASE_URL_INTERNAL: http://backend:8000
+    NEXT_PUBLIC_SHALLWE_SKIP_MIDDLEWARE: ${NEXT_PUBLIC_SHALLWE_SKIP_MIDDLEWARE:?}
 
 
 services:
@@ -60,6 +62,7 @@ services:
   frontend-noapi:
     <<: *extend-frontend
     build:
+      <<: *frontend-build-context
       target: dev
     volumes:
       - ./mock_frontend/shallwe:/app     # mount code for hot reload
@@ -71,6 +74,7 @@ services:
   frontend-dev:
     <<: *extend-frontend
     build:
+      <<: *frontend-build-context
       target: dev
     volumes:
       - ./mock_frontend/shallwe:/app     # mount code for hot reload
@@ -84,6 +88,7 @@ services:
   frontend-prod:
     <<: *extend-frontend
     build:
+      <<: *frontend-build-context
       target: prod
     command: node server.js
     depends_on:
