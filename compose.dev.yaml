@@ -18,6 +18,13 @@ x-extend-frontend: &extend-frontend
       - /app/.next                      # anonymous volume to avoid overrides in host
   build:
     context: ./mock_frontend/shallwe
+    args:
+      NEXT_PUBLIC_SHALLWE_ENV_MODE: ${NEXT_PUBLIC_SHALLWE_ENV_MODE:?}
+      NEXT_PUBLIC_SHALLWE_OAUTH_CLIENT_ID: ${NEXT_PUBLIC_SHALLWE_OAUTH_CLIENT_ID:?}
+      NEXT_PUBLIC_SHALLWE_OAUTH_REDIRECT_URI: ${NEXT_PUBLIC_SHALLWE_OAUTH_REDIRECT_URI:?}
+      NEXT_PUBLIC_SHALLWE_API_BASE_URL_EXTERNAL: ${NEXT_PUBLIC_SHALLWE_API_BASE_URL_EXTERNAL:?}
+      NEXT_PUBLIC_SHALLWE_API_BASE_URL_INTERNAL: http://backend:8000
+      NEXT_PUBLIC_SHALLWE_SKIP_MIDDLEWARE: ${NEXT_PUBLIC_SHALLWE_SKIP_MIDDLEWARE:?}
   ports:
     - "3000:3000"
 
@@ -36,6 +43,8 @@ services:
   backend:
     build:
       context: ./shallwe_core
+      args:
+        SHALLWE_BACKEND_DEEPFACE_MODELS: ${SHALLWE_BACKEND_DEEPFACE_MODELS:?}
     volumes:
       - ./shallwe_core:/app             # mount code for hot reload
     depends_on:
