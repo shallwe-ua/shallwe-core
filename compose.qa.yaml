@@ -21,12 +21,6 @@ services:
 
   # backend overrides for qa
   backend:
-    volumes:
-      - staticfiles:/app/staticfiles    # static volume for shared access with nginx
-      - media:/app/media                # ^ same for media
-      - django_logs:/tmp/django         # persistent logs for debug
-    environment:
-      SHALLWE_BACKEND_DB_HOST: db       # override to talk to db container
     profiles:
       - qa
 

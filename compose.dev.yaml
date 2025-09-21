@@ -47,11 +47,6 @@ services:
         SHALLWE_BACKEND_DEEPFACE_MODELS: ${SHALLWE_BACKEND_DEEPFACE_MODELS:?}
     volumes:
       - ./shallwe_core:/app             # mount code for hot reload
-    depends_on:
-      db:
-        condition: service_healthy
-    environment:
-      SHALLWE_BACKEND_DB_HOST: db       # override to talk to db container
     ports:
       - "8000:8000"
     profiles:
