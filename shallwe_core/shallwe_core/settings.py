@@ -7,6 +7,9 @@ from pathlib import Path
 from .envconfig.envconstants import *
 
 
+SHALLWE_BACKEND_VERSION = '0.7.0-a'
+
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
