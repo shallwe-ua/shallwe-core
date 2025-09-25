@@ -26,6 +26,7 @@ _Note: you can also use docker files and entrypoints as instructions for local r
 📋 **Nearest plans**:
 - Add full documentation
 - Add logging
+- Add CI/CD
 - Provide a minimal demo frontend covering all features (⚠️ *not* `mock_frontend`, which is only for the most basic manual tests)  
 - Deploy and run in AWS (or an affordable cloud alternative)
 
