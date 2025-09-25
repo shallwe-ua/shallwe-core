@@ -43,7 +43,8 @@ INSTALLED_APPS = [
     'shallwe_access',
     'shallwe_locations',
     'shallwe_photo',
-    'shallwe_profile'
+    'shallwe_profile',
+    'shallwe_healthcheck'
 ]
 
 

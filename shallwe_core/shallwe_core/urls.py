@@ -32,6 +32,7 @@ urlpatterns = [
         path('photo/', include('shallwe_photo.urls')),
         path('profile/', include('shallwe_profile.urls')),
         path('access/', include('shallwe_access.urls')),
+        path('health/', include('shallwe_healthcheck.urls')),
     ])),
 ]
 
