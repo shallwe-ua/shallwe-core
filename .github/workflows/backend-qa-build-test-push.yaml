@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       # --- image info ---
-      BACKEND_IMAGE_NAME: ${{ vars.IMAGE_REGISTRY_URL }}/${{ vars.IMAGE_REGISTRY_NAMESPACE }}/backend:${GITHUB_REF#refs/tags/}
+      BACKEND_IMAGE_NAME: ${{ vars.IMAGE_REGISTRY_URL }}/${{ vars.IMAGE_REGISTRY_NAMESPACE }}/backend:${{ github.ref_name }}
       # --- backend globals ---
       SHALLWE_GLOBAL_SITE_URL_EXTERNAL: http://localhost:8000
       SHALLWE_GLOBAL_SITE_URL_INTERNAL: http://host.docker.internal:8000
