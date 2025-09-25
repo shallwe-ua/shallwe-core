@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       # --- image info ---
-      BACKEND_IMAGE_NAME: ${{ vars.IMAGE_REGISTRY_URL }}/${{ vars.IMAGE_REGISTRY_NAMESPACE }}/backend
+      BACKEND_IMAGE_FULL: ${{ vars.IMAGE_REGISTRY_URL }}/${{ vars.IMAGE_REGISTRY_NAMESPACE }}/backend:${{ github.ref_name }}
       # --- backend globals ---
       SHALLWE_GLOBAL_SITE_URL_EXTERNAL: http://localhost:8000
       SHALLWE_GLOBAL_SITE_URL_INTERNAL: http://localhost:8000
@@ -85,24 +85,11 @@ jobs:
           password: ${{ secrets.IMAGE_REGISTRY_TOKEN }}
 
 
-      - name: Extract tag name or set default to env
-        run: |
-          REF_TYPE=${GITHUB_REF#refs/}
-          if [[ "$REF_TYPE" == "tags/"* ]]; then
-            TAG_NAME=${GITHUB_REF#refs/tags/}
-          else
-            TAG_NAME="qa-ci-test"
-          fi
-          echo "TAG_NAME=$TAG_NAME" >> $GITHUB_ENV
-          echo "BACKEND_IMAGE_WITH_TAG=$BACKEND_IMAGE_NAME:$TAG_NAME" >> $GITHUB_ENV
-          echo "Extracted tag name or default: $TAG_NAME"
-
-
       - name: Build Docker image
         run: |
           docker build \
             --build-arg SHALLWE_BACKEND_DEEPFACE_MODELS \
-            -t $BACKEND_IMAGE_WITH_TAG ./shallwe_core
+            -t $BACKEND_IMAGE_FULL ./shallwe_core
 
 
       - name: Run tests on Docker image
@@ -135,10 +122,10 @@ jobs:
             -e SHALLWE_BACKEND_CREDENTIALS_COOKIE_DOMAIN \
             -e SHALLWE_BACKEND_DEEPFACE_MODELS \
             -e TF_CPP_MIN_LOG_LEVEL \
-            $BACKEND_IMAGE_WITH_TAG \
+            $BACKEND_IMAGE_FULL \
             sh -c "python3 ./shallwe_core/envconfig/parse_to_constants.py && python3 manage.py test --noinput -v 2"
 
 
       - name: Push Docker image if tests pass
         if: success()
-        run: docker push $BACKEND_IMAGE_WITH_TAG
+        run: docker push $BACKEND_IMAGE_FULL
