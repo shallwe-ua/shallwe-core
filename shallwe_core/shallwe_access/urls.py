@@ -4,5 +4,5 @@ from .views import GetProfileStatusView
 
 
 urlpatterns = [
-    path('profile-status', GetProfileStatusView.as_view(), name='profile-status'),
+    path('profile-status/', GetProfileStatusView.as_view(), name='profile-status'),
 ]
