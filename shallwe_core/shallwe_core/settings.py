@@ -204,6 +204,13 @@ LOGGING = {
 
 
 # ----- App-specific settings -----
+# Rest framework
+REST_FRAMEWORK = {
+        'DEFAULT_RENDERER_CLASSES': (
+            'rest_framework.renderers.JSONRenderer',
+        )
+    }
+
 # Allauth settings
 SITE_ID = 1
 ACCOUNT_EMAIL_VERIFICATION = 'none'
@@ -242,6 +249,12 @@ PROFILE_INTEREST_REGEX = r'^[а-яА-ЯёЁіІїЇєЄґҐ`\'\-\s]{2,32}$'
 
 
 # ----- Mode-specific settings -----
+# Rest framework
+if SHALLWE_BACKEND_REST_BROWSABLE:
+    REST_FRAMEWORK['DEFAULT_RENDERER_CLASSES'] += (
+        'rest_framework.renderers.BrowsableAPIRenderer',
+    )
+
 # For database schema
 if SHALLWE_GLOBAL_ENV_MODE == 'DEV':
     INSTALLED_APPS.append('django_extensions')
