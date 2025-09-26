@@ -56,17 +56,34 @@ run_dev_server() {
 run_qa_server() {
   echo "[entrypoint] Starting QA server with Gunicorn..."
 
+  # Get desired workers count
   CPU_CORES_COUNT=$(getconf _NPROCESSORS_ONLN)
-  WORKERS_COUNT=$((2 * CPU_CORES_COUNT + 1))
+  WORKERS_COUNT=$((SHALLWE_BACKEND_ENTRYPOINT_WORKERS_MULT * CPU_CORES_COUNT + 1))
   echo "[entrypoint] Using $WORKERS_COUNT Gunicorn workers"
 
-  # Gunicorn replaces the shell; assuming static/media served by NGINX
+  # Use or not preload
+  PRELOAD_ARG=""
+  if [ "$SHALLWE_BACKEND_ENTRYPOINT_WORKERS_PRELOAD" = "true" ]; then
+    PRELOAD_ARG="--preload"
+  fi
+
+  # Timeout setting
+  TIMEOUT_ARG=""
+  if [ -n "$SHALLWE_BACKEND_ENTRYPOINT_WORKERS_TIMEOUT" ]; then
+    TIMEOUT_ARG="--timeout $SHALLWE_BACKEND_ENTRYPOINT_WORKERS_TIMEOUT"
+  else
+    TIMEOUT_ARG="--timeout 30"  # Default gunicorn timeout
+  fi
+
+  # Gunicorn replaces the shell; assuming static/media served externally
   exec gunicorn shallwe_core.wsgi:application \
     --bind 0.0.0.0:8000 \
     --workers "$WORKERS_COUNT" \
     --log-level info \
     --capture-output \
-    --forwarded-allow-ips="*"
+    --forwarded-allow-ips="*" \
+    $PRELOAD_ARG \
+    "$TIMEOUT_ARG"
 }
 
 
