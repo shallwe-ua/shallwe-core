@@ -28,6 +28,7 @@ jobs:
       # --- django core ---
       SHALLWE_BACKEND_SECRET_KEY: citestkey123
       SHALLWE_BACKEND_DEBUG_ON: False
+      SHALLWE_BACKEND_REST_BROWSABLE: False
       # --- entrypoint ---
       SHALLWE_BACKEND_ENTRYPOINT_AUTORUN: false
       SHALLWE_BACKEND_ENTRYPOINT_AUTOTEST: false
@@ -104,6 +105,7 @@ jobs:
             -e SHALLWE_GLOBAL_ENV_MODE \
             -e SHALLWE_BACKEND_SECRET_KEY \
             -e SHALLWE_BACKEND_DEBUG_ON \
+            -e SHALLWE_BACKEND_REST_BROWSABLE \
             -e SHALLWE_BACKEND_ENTRYPOINT_AUTORUN \
             -e SHALLWE_BACKEND_ENTRYPOINT_AUTOTEST \
             -e DJANGO_SUPERUSER_USERNAME \
