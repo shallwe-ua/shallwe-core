@@ -61,29 +61,32 @@ run_qa_server() {
   WORKERS_COUNT=$((SHALLWE_BACKEND_ENTRYPOINT_WORKERS_MULT * CPU_CORES_COUNT + 1))
   echo "[entrypoint] Using $WORKERS_COUNT Gunicorn workers"
 
-  # Use or not preload
-  PRELOAD_ARG=""
-  if [ "$SHALLWE_BACKEND_ENTRYPOINT_WORKERS_PRELOAD" = "true" ]; then
-    PRELOAD_ARG="--preload"
+  # Build gunicorn arguments array
+  GUNICORN_ARGS=(
+    --bind 0.0.0.0:8000
+    --workers "$WORKERS_COUNT"
+    --log-level info
+    --capture-output
+    --forwarded-allow-ips="*"
+  )
+
+  # Add timeout
+  if [ -n "$SHALLWE_BACKEND_ENTRYPOINT_WORKERS_TIMEOUT" ]; then
+    GUNICORN_ARGS+=(--timeout "$SHALLWE_BACKEND_ENTRYPOINT_WORKERS_TIMEOUT")
+  else
+    GUNICORN_ARGS+=(--timeout 30)  # Default gunicorn timeout
   fi
 
-  # Timeout setting
-  TIMEOUT_ARG=""
-  if [ -n "$SHALLWE_BACKEND_ENTRYPOINT_WORKERS_TIMEOUT" ]; then
-    TIMEOUT_ARG="--timeout $SHALLWE_BACKEND_ENTRYPOINT_WORKERS_TIMEOUT"
-  else
-    TIMEOUT_ARG="--timeout 30"  # Default gunicorn timeout
+  # Add preload if enabled
+  if [ "$SHALLWE_BACKEND_ENTRYPOINT_WORKERS_PRELOAD" = "true" ]; then
+    GUNICORN_ARGS+=(--preload)
+    echo "[entrypoint] Using preload mode Gunicorn"
   fi
+
+  GUNICORN_ARGS+=(shallwe_core.wsgi:application)
 
   # Gunicorn replaces the shell; assuming static/media served externally
-  exec gunicorn shallwe_core.wsgi:application \
-    --bind 0.0.0.0:8000 \
-    --workers "$WORKERS_COUNT" \
-    --log-level info \
-    --capture-output \
-    --forwarded-allow-ips="*" \
-    $PRELOAD_ARG \
-    "$TIMEOUT_ARG"
+  exec gunicorn "${GUNICORN_ARGS[@]}"
 }
 
 
