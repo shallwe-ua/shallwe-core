@@ -27,7 +27,7 @@ class EnvSettings(BaseSettings):
     SHALLWE_BACKEND_CORS_ALLOWED_ORIGINS: Annotated[Tuple[str, ...], NoDecode]
     SHALLWE_BACKEND_CREDENTIALS_COOKIE_DOMAIN: Optional[str] = None
     SHALLWE_BACKEND_CREDENTIALS_COOKIE_SAMESITE: Optional[str] = None
-    SHALLWE_BACKEND_CRENEDTIALS_COOKIE_SECURE: bool = False
+    SHALLWE_BACKEND_CREDENTIALS_COOKIE_SECURE: bool = False
     SHALLWE_BACKEND_DEEPFACE_MODELS: Annotated[Tuple[str, ...], NoDecode]
 
     # noinspection PyNestedDecorators
