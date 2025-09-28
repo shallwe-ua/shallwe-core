@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "shallwe-core"
-version = "0.7.1a3"
+version = "0.7.1a4"
 description = "Shallwe UA requirements"
 authors = ["featurelle and team"]
 
@@ -95,6 +95,7 @@ django-allow-cidr = "^0.8.0"
 
 [tool.poetry.group.dev.dependencies]
 django-extensions = "3.2.3"
+psutil = "<=7.1.0"
 
 [build-system]
 requires = ["poetry-core"]
