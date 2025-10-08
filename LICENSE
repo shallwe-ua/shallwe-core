@@ -1,0 +1,43 @@
+SPDX-License-Identifier: LicenseRef-Evaluation-Only
+
+Evaluation License (Read-Only, Source-Available)
+
+Copyright (c) 2023–2025, Shallwe project author(s). All rights reserved.
+
+1. Grant of Limited License
+   Subject to the terms below, the Licensor grants you a limited, revocable, non-exclusive, non-transferable license to:
+   - clone and locally view the source code;
+   - build and run the software locally or in your personal or private cloud account solely for internal evaluation and recruiting/technical review (non-commercial, non-production).
+
+2. Restrictions
+   You shall NOT:
+   - use the software in production or any commercial context;
+   - make the software or any running instance publicly available as a service (beyond private evaluation access by you or your immediate team for hiring/technical review);
+   - modify, adapt, translate, or create derivative works from the software, except as strictly necessary to configure and run your private evaluation;
+   - distribute, sublicense, sell, lease, rent, host for third parties, or otherwise make the software or any derivative available to third parties;
+   - publish, copy, or disclose any portion of the software beyond what is necessary for the evaluation described above;
+   - remove or obscure any copyright, trademark, or proprietary notices;
+   - attempt to circumvent technical limitations or reverse engineer except to the extent permitted by applicable law.
+
+3. Ownership
+   The software is licensed, not sold. The Licensor retains all right, title, and interest in and to the software and all copies thereof.
+
+4. Term and Termination
+   This license is effective until terminated. It automatically terminates if you breach any term. Upon termination, you must cease all use, delete all copies, and certify deletion upon request. The Licensor may revoke this license at any time at its discretion.
+
+5. No Warranty
+   THE SOFTWARE IS PROVIDED “AS IS” AND “AS AVAILABLE,” WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE, AND NON‑INFRINGEMENT. YOU ASSUME ALL RISKS ARISING OUT OF USE OR PERFORMANCE.
+
+6. Limitation of Liability
+   TO THE MAXIMUM EXTENT PERMITTED BY LAW, IN NO EVENT SHALL THE LICENSOR OR CONTRIBUTORS BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, EXEMPLARY, OR PUNITIVE DAMAGES, OR ANY LOSS OF PROFITS, REVENUE, DATA, OR GOODWILL, ARISING OUT OF OR IN CONNECTION WITH THIS LICENSE OR THE USE OR INABILITY TO USE THE SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. IN NO EVENT SHALL THE TOTAL LIABILITY EXCEED ONE HUNDRED (100) USD.
+
+7. Feedback
+   Any feedback, ideas, or suggestions you provide may be used by the Licensor without restriction or obligation of any kind.
+
+8. Entire Agreement
+   This License constitutes the entire agreement between you and the Licensor with respect to the software’s evaluation use and supersedes all prior or contemporaneous communications. If any provision is held unenforceable, the remainder shall remain in full force.
+
+9. Contact for Alternative Terms
+   For commercial, production, educational, or broader rights, please contact the Licensor to negotiate a separate agreement.
+
+END OF TERMS
