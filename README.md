@@ -108,7 +108,7 @@ If you want to launch beyond local Compose, that repo is the place to start. How
 
 📚 API docs
 
-- Swagger/OpenAPI (current public spec): `https://app.swaggerhub.com/apis/S3MCHANNEL/shallwe-api/0.6.1`
+- Swagger/OpenAPI (current public spec): https://app.swaggerhub.com/apis/S3MCHANNEL/shallwe-api/0.6.1
   - Note: one minor gap vs latest code (healthcheck endpoint addition). The rest matches the running demo.
 
 ---
