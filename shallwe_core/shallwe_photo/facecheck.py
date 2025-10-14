@@ -6,8 +6,6 @@ from PIL import Image
 from deepface import DeepFace
 from django.conf import settings
 
-from shallwe_util.efficiency import time_measure, ram_measure
-
 
 def _run_backend_silent(image_path, backend):
     with open(os.devnull, 'w') as null_file:
@@ -52,5 +50,7 @@ def check_face_minified_temp(image: Image.Image):
 
 
 if settings.SHALLWE_GLOBAL_ENV_MODE == 'DEV':
+    from shallwe_util.efficiency import time_measure, ram_measure
+
     check_face = time_measure(check_face)
     _run_backend_silent = ram_measure(_run_backend_silent)
