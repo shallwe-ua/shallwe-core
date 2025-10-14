@@ -3,6 +3,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Optional
 
+from django.conf import settings
 from django.db import connection
 
 
@@ -79,10 +80,12 @@ class DatabaseHealthCheck(BaseHealthCheck):
 class HealthCheckReport:
     """
     Health check report:
+    - version
     - is_healthy
     - checks: {name: {details}}
     Serializable (to_dict)
     """
+    version: str
     checks: dict[str, CheckResult]
     is_healthy: bool = True
 
@@ -111,4 +114,8 @@ class HealthCheckRunner:
             checks_results[check.name] = result
             overall_healthy = overall_healthy and result.is_healthy
 
-        return HealthCheckReport(checks=checks_results, is_healthy=overall_healthy)
+        return HealthCheckReport(
+            version=settings.SHALLWE_BACKEND_VERSION,
+            checks=checks_results,
+            is_healthy=overall_healthy
+        )
