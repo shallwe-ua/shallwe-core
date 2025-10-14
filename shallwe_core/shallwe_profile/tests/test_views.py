@@ -178,6 +178,47 @@ class ProfileUpdateAPIViewTest(AuthorizedAPITestCase):
         check(valid_data3)
         self.assertEqual(get_profile().rent_preferences.room_sharing_level, 1)
 
+    def test_profile_update_nullification(self):
+        def check(data):
+            response = self._get_response_shortcut(data)
+            print(response.data)
+            self.assertEqual(response.status_code, 200)
+            return response
+
+        def get_profile():
+            return UserProfile.objects.get(pk=self.profile.pk)
+
+        # First, set some values that can be nullified
+        update_data = {
+            'about[occupation_type]': 2,
+            'about[drinking_level]': 3,
+            'about[neighbourliness_level]': 2,
+            'about[bio]': 'Тестовий текст'
+        }
+        check(update_data)
+
+        profile = get_profile()
+        self.assertEqual(profile.about.occupation_type, 2)
+        self.assertEqual(profile.about.drinking_level, 3)
+        self.assertEqual(profile.about.neighbourliness_level, 2)
+        self.assertEqual(profile.about.bio, 'Тестовий текст')
+
+        # Test with the string "null"
+        nullify_data_with_null_string = {
+            'about[occupation_type]': 'null',
+            'about[drinking_level]': 'null',
+            'about[neighbourliness_level]': 'null',
+            'about[bio]': 'null'
+        }
+        check(nullify_data_with_null_string)
+
+        profile = get_profile()
+        # Check if the fields were set to null with "null" string
+        self.assertIsNone(profile.about.occupation_type)
+        self.assertIsNone(profile.about.drinking_level)
+        self.assertIsNone(profile.about.neighbourliness_level)
+        self.assertIsNone(profile.about.bio)
+
 
 class ProfileReadAPIViewTest(AuthorizedAPITestCase):
     fixtures = ['locations_mini_fixture.json']

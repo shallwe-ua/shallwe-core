@@ -51,6 +51,9 @@ class MultiPartWithNestedToJSONParser(MultiPartParser):
         # Convert to boolean if possible
         elif isinstance(value, str) and value.lower() in ['true', 'false']:
             return value.lower() == 'true'
+        # Catch nulls
+        elif isinstance(value, str) and value.lower() == 'null':
+            return None
         else:
             return value
 
