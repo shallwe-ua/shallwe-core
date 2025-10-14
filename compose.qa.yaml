@@ -10,6 +10,7 @@ services:
 
   # include nginx
   nginx:
+    image: ${SHALLWE_GLOBAL_DOCKER_REGISTRY_URL}nginx:${SHALLWE_GLOBAL_DOCKER_NGINX_IMAGE_TAG:?}
     profiles:
       - qa
 

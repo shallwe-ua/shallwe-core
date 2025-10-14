@@ -14,7 +14,6 @@ x-common-env-file: &common-env-file
 services:
 
   nginx:
-    image: ${SHALLWE_GLOBAL_DOCKER_REGISTRY_URL}nginx:${SHALLWE_GLOBAL_DOCKER_NGINX_IMAGE_TAG:?}
     <<: *common-env-file
     environment:
       SHALLWE_GLOBAL_SITE_URL_INTERNAL: http://frontend:3000
