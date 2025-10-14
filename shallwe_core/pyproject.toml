@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "shallwe-core"
-version = "0.7.1a4"
+version = "0.7.2a1"
 description = "Shallwe UA requirements"
 authors = ["featurelle and team"]
 
