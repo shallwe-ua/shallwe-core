@@ -2,20 +2,26 @@ import os
 import tempfile
 from contextlib import redirect_stdout
 
+import cv2
 from PIL import Image
 from deepface import DeepFace
 from django.conf import settings
 
 
 def _run_backend_silent(image_path, backend):
-    with open(os.devnull, 'w') as null_file:
-        with redirect_stdout(null_file):  # redirecting stdout to null to prevent progress bars in console
-            result = DeepFace.extract_faces(
-                image_path,
-                detector_backend=backend,
-                enforce_detection=False
-            )
-            return result
+    try:
+        with open(os.devnull, 'w') as null_file:
+            with redirect_stdout(null_file):  # redirecting stdout to null to prevent progress bars in console
+                result = DeepFace.extract_faces(
+                    image_path,
+                    detector_backend=backend,
+                    enforce_detection=False
+                )
+                return result
+    except cv2.error as e:
+        # Catch the bogus crop case that happens in ssd for big face frames and return no faces instead of crashing
+        print(f"OpenCV face detector failed for {backend}: {e}")
+        return [{'confidence': 0}]
 
 
 def check_face(image_path):
