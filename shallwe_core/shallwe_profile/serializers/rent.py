@@ -135,6 +135,7 @@ class UserProfileRentPreferencesReadSerializer(serializers.ModelSerializer):
             elif category == 'c':
                 serialized_locations['cities'].append(OrderedDict([
                     ('hierarchy', location['hierarchy']),
+                    ('region_name', location['region_name']),
                     ('ppl_name', location['ppl_name']),
                     ('districts', [])
                 ]))
