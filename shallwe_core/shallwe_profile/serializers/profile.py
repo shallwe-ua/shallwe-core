@@ -1,6 +1,7 @@
 import re
 from collections import OrderedDict
 
+from django.conf import settings
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
 
@@ -44,11 +45,20 @@ class UserProfileBaseCreateUpdateSerializer(serializers.ModelSerializer):
         return name
 
 
+class PublicMediaImageField(serializers.ImageField):
+    def to_representation(self, value):
+        relative_url = super().to_representation(value)
+        if not relative_url:
+            return None
+        base_url = (settings.SHALLWE_GLOBAL_MEDIA_STORAGE_URL_EXTERNAL or "").rstrip("/")
+        return f"{base_url}{relative_url}" if base_url else relative_url
+
+
 class UserProfileBaseReadSerializer(serializers.ModelSerializer):
-    photo_w768 = serializers.ImageField()
-    photo_w540 = serializers.ImageField()
-    photo_w192 = serializers.ImageField()
-    photo_w64 = serializers.ImageField()
+    photo_w768 = PublicMediaImageField()
+    photo_w540 = PublicMediaImageField()
+    photo_w192 = PublicMediaImageField()
+    photo_w64 = PublicMediaImageField()
 
     class Meta:
         model = UserProfile

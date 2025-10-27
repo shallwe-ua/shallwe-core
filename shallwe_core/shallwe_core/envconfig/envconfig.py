@@ -8,6 +8,7 @@ from pydantic_settings import BaseSettings, NoDecode
 class EnvSettings(BaseSettings):
     SHALLWE_GLOBAL_SITE_URL_EXTERNAL: str
     SHALLWE_GLOBAL_SITE_URL_INTERNAL: str
+    SHALLWE_GLOBAL_MEDIA_STORAGE_URL_EXTERNAL: Optional[str] = None
     SHALLWE_GLOBAL_OAUTH_CLIENT_ID: str
     SHALLWE_GLOBAL_OAUTH_CLIENT_SECRET: str
     SHALLWE_GLOBAL_ENV_MODE: str
