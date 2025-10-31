@@ -171,20 +171,6 @@ class UserProfileWithParametersSerializerUpdateTestCase(TestCase):
             self.assertFalse(serializer.is_valid().is_all_valid)
             return serializer
 
-        data_invalid_budget = {
-            'rent_preferences': {
-                'min_budget': 500
-            }
-        }
-        check(data_invalid_budget)
-
-        data_invalid_rent_duration = {
-            'rent_preferences': {
-                'min_rent_duration_level': 1
-            }
-        }
-        check(data_invalid_rent_duration)
-
         data_invalid_locations = {
             'rent_preferences': {
                 'locations': ['UA', 'UA01']

@@ -53,19 +53,21 @@ class UserProfileRentPreferencesCreateUpdateSerializer(serializers.ModelSerializ
         return locations
 
     def validate(self, attrs):
+        is_creating = self.instance is None
+
         # Same checks for budget and rent duration fields:
         for field_group_name in ('budget', 'rent_duration_level'):
             field_group_values = []
-            # Add min/max to a list values if not None
+            # Add min/max to a list of values if not None
             for prefix in ('min_', 'max_'):
                 attr_value = attrs.get(prefix + field_group_name)
                 if isinstance(attr_value, int):
                     field_group_values.append(attr_value)
 
-            # Check whether both min/max or neither provided
-            if len(field_group_values) == 1:
+            # Check whether both min/max or neither provided if creating
+            if is_creating and len(field_group_values) == 1:
                 raise serializers.ValidationError(
-                    f'Both values for {field_group_name} should be provided or neither'
+                    f'Both values for {field_group_name} should be provided'
                 )
 
             # Check whether max >= min if both provided
@@ -75,9 +77,7 @@ class UserProfileRentPreferencesCreateUpdateSerializer(serializers.ModelSerializ
                         f'min_{field_group_name} must not be greater than max_{field_group_name}'
                     )
 
-        super().validate(attrs)
-
-        return attrs
+        return super().validate(attrs)
 
     def create_or_update_instance(self, instance, validated_data):
         locations_data = validated_data.pop('locations', [])
