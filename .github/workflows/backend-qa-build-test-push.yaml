@@ -21,6 +21,7 @@ jobs:
       # --- backend globals ---
       SHALLWE_GLOBAL_SITE_URL_EXTERNAL: http://localhost:8000
       SHALLWE_GLOBAL_SITE_URL_INTERNAL: http://localhost:8000
+      SHALLWE_GLOBAL_MEDIA_STORAGE_URL_EXTERNAL: http://localhost:8000
       SHALLWE_GLOBAL_OAUTH_CLIENT_ID: 255892543568-1o2fma0nns066agr5a2m9uipfnmeneai.apps.googleusercontent.com
       SHALLWE_GLOBAL_OAUTH_CLIENT_SECRET: ${{ secrets.SHALLWE_GLOBAL_OAUTH_CLIENT_SECRET }}
       SHALLWE_GLOBAL_OAUTH_REDIRECT_URI: http://localhost:8000
@@ -99,6 +100,7 @@ jobs:
             --entrypoint "" \
             -e SHALLWE_GLOBAL_SITE_URL_EXTERNAL \
             -e SHALLWE_GLOBAL_SITE_URL_INTERNAL \
+            -e SHALLWE_GLOBAL_MEDIA_STORAGE_URL_EXTERNAL \
             -e SHALLWE_GLOBAL_OAUTH_CLIENT_ID \
             -e SHALLWE_GLOBAL_OAUTH_CLIENT_SECRET \
             -e SHALLWE_GLOBAL_OAUTH_REDIRECT_URI \

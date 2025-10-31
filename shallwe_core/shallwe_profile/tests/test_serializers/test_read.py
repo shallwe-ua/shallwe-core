@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 
+from shallwe_util.tests import get_full_expected_media_url
 from shallwe_locations.models import Location
 from ...models import UserProfile, UserProfileRentPreferences, UserProfileAbout
 from ...serializers import UserProfileRentPreferencesReadSerializer
@@ -180,10 +181,10 @@ class UserProfileBaseReadSerializerTestCase(TestCase):
         expected_serialization = OrderedDict([
             ('is_hidden', False),
             ('name', 'ТестЮзер'),
-            ('photo_w768', '/media/profile-photos/valid-format.webp'),
-            ('photo_w540', '/media/CACHE/images/profile-photos/valid-format/48b30af8f559237f115cb97f6b29d6c3.webp'),
-            ('photo_w192', '/media/CACHE/images/profile-photos/valid-format/ffdfdd5001b678517d6f10c82650581a.webp'),
-            ('photo_w64', '/media/CACHE/images/profile-photos/valid-format/181eccfd1992d4775c37070e9b98e463.webp')
+            ('photo_w768', get_full_expected_media_url('/media/profile-photos/valid-format.webp')),
+            ('photo_w540', get_full_expected_media_url('/media/CACHE/images/profile-photos/valid-format/48b30af8f559237f115cb97f6b29d6c3.webp')),
+            ('photo_w192', get_full_expected_media_url('/media/CACHE/images/profile-photos/valid-format/ffdfdd5001b678517d6f10c82650581a.webp')),
+            ('photo_w64', get_full_expected_media_url('/media/CACHE/images/profile-photos/valid-format/181eccfd1992d4775c37070e9b98e463.webp'))
         ])
 
         serializer = UserProfileBaseReadSerializer(self.profile)
@@ -242,13 +243,13 @@ class UserProfileWithParametersSerializerReadTestCase(TestCase):
               OrderedDict([('is_hidden', False),
                            ('name', 'ТестЮзер'),
                            ('photo_w768',
-                            '/media/profile-photos/valid-format.webp'),
+                            get_full_expected_media_url('/media/profile-photos/valid-format.webp')),
                            ('photo_w540',
-                            '/media/CACHE/images/profile-photos/valid-format/48b30af8f559237f115cb97f6b29d6c3.webp'),
+                            get_full_expected_media_url('/media/CACHE/images/profile-photos/valid-format/48b30af8f559237f115cb97f6b29d6c3.webp')),
                            ('photo_w192',
-                            '/media/CACHE/images/profile-photos/valid-format/ffdfdd5001b678517d6f10c82650581a.webp'),
+                            get_full_expected_media_url('/media/CACHE/images/profile-photos/valid-format/ffdfdd5001b678517d6f10c82650581a.webp')),
                            ('photo_w64',
-                            '/media/CACHE/images/profile-photos/valid-format/181eccfd1992d4775c37070e9b98e463.webp')])),
+                            get_full_expected_media_url('/media/CACHE/images/profile-photos/valid-format/181eccfd1992d4775c37070e9b98e463.webp'))])),
              ('rent_preferences',
               OrderedDict([('min_budget', 1000),
                            ('max_budget', 2000),

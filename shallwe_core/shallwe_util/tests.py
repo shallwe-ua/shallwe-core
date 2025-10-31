@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.test import TestCase, Client
 from django.test.client import MULTIPART_CONTENT, encode_multipart, BOUNDARY
@@ -36,3 +37,7 @@ class AuthorizedAPITestCase(TestCase):
         client.logout()
 
         return response
+
+
+def get_full_expected_media_url(media_relative_url):
+    return settings.SHALLWE_GLOBAL_MEDIA_STORAGE_URL_EXTERNAL + media_relative_url
