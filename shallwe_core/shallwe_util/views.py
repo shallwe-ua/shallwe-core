@@ -1,65 +1,69 @@
 from rest_framework.parsers import MultiPartParser
 
 
-class MultiPartWithNestedToJSONParser(MultiPartParser):
+class MultiPartWithNestedToDictParser(MultiPartParser):
     """
-    Parses structures like\n
-    {
-        block1[param1]: value1,\n
-        block1[param2]: value2,\n
-        block2: [1, 2, 3]
-    }\n
-    Into JSON-like\n
-    {
-        block1: {
-            param1: value1,\n
-            param2: value2\n
-        },
-        block2: [1, 2, 3]
-    }\n
-    Also returns all data as data, doesn't use file attribute as it's not used in serializers
+    Parses multipart/form-data structures with key conventions:
+      - Double underscore "__" denotes nesting
+      - Suffix "[]" denotes list fields
+
+    Example request load:
+        about__smoking_level = 2
+        about__other_animals[] = cat
+        about__other_animals[] = dog
+        rent_preferences__locations[] = kyiv
+
+    Output JSON-like structure:
+        {
+            "about": {
+                "smoking_level": "2",
+                "other_animals": ["cat", "dog"]
+            },
+            "rent_preferences": {
+                "locations": ["kyiv"]
+            }
+        }
+
+    It does not assume types for literals - do it in a controlled way in the serializer to avoid bugs like name=True
     """
-
-    def _jsonify_data(self, data):
-        all_data_lists = list(data.data.lists()) + list(data.files.lists())
-        jsonified_data = {}
-        for key, value in all_data_lists:
-            parts = key.split('[')
-            current = jsonified_data
-            for part in parts[:-1]:
-                part_name = part.rstrip(']')
-                if part_name not in current:
-                    current[part_name] = {}
-                current = current[part_name]
-            final_key = parts[-1].rstrip(']')
-            # Convert value to int, list of ints, boolean, or list of booleans if possible
-            final_value = self._convert_value(value)
-            current[final_key] = final_value
-        return jsonified_data
-
-    def _convert_value(self, value):
-        # Check if value is a list
-        if isinstance(value, list):
-            # If list has only one item, return the item directly
-            if len(value) == 1:
-                return self._convert_value(value[0])
-            # Recursively process each item in the list
-            return [self._convert_value(item) for item in value]
-        # Convert value to int if possible
-        elif isinstance(value, str) and value.isdigit():
-            return int(value)
-        # Convert to boolean if possible
-        elif isinstance(value, str) and value.lower() in ['true', 'false']:
-            return value.lower() == 'true'
-        # Catch nulls
-        elif isinstance(value, str) and value.lower() == 'null':
-            return None
-        else:
-            return value
 
     def parse(self, stream, media_type=None, parser_context=None):
         basic_result = super().parse(stream, media_type, parser_context)
         jsonified_data = self._jsonify_data(basic_result)
+        return jsonified_data
+
+    def _jsonify_data(self, data):
+        """Convert flat QueryDict (all values come from parent Parser as lists) to a nested JSON with correct types."""
+        all_data_lists = list(data.data.lists()) + list(data.files.lists())
+        jsonified_data: dict = {}
+
+        for key_schema, field_value_as_list in all_data_lists:
+            # scan the key structure
+            is_list_field = key_schema.endswith("[]")
+            if is_list_field:
+                key_schema = key_schema[:-2]  # remove []
+
+            key_nodes = key_schema.split("__")  # split nested key
+            fieldgroup_keys = key_nodes[:-1]  # where to nest
+            field_key = key_nodes[-1]  # what to nest
+            current_fieldgroup = jsonified_data  # current nested level
+
+            # set nested structure {stuff: {about: {etc...}}}
+            for key in fieldgroup_keys:
+                if key not in current_fieldgroup:
+                    current_fieldgroup[key] = {}
+                current_fieldgroup = current_fieldgroup[key]  # go level deeper
+
+            # get value as list or literal
+            field_value_raw = field_value_as_list if is_list_field else field_value_as_list[0]
+
+            # interpret [''] -> as empty list []
+            if is_list_field and field_value_raw == ['']:
+                field_value_raw = []
+
+            # set final value
+            current_fieldgroup[field_key] = field_value_raw
+
         return jsonified_data
 
 
@@ -72,7 +76,7 @@ def validate_received_data_structure(received_data, serializer):
         for key, value in _received_data.items():
             if key not in _expected_fields:
                 raise UnexpectedFieldError(
-                    f"""Unexpected field '{f"{prev}[{key}]" if prev else key}' in received data""")
+                    f"""Unexpected field '{f"{prev}__{key}" if prev else key}' in received data""")
 
             # Check if the value is a dictionary (nested structure)
             if isinstance(value, dict):

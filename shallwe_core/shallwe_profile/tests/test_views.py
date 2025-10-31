@@ -7,7 +7,7 @@ from PIL import Image
 from django.core.files.uploadedfile import SimpleUploadedFile
 
 from ..models import UserProfile, UserProfileAbout, UserProfileRentPreferences
-from shallwe_util.tests import AuthorizedAPITestCase
+from shallwe_util.tests import AuthorizedAPITestCase, get_full_expected_media_url
 
 
 class ProfileCreateAPIViewTest(AuthorizedAPITestCase):
@@ -15,15 +15,15 @@ class ProfileCreateAPIViewTest(AuthorizedAPITestCase):
 
     def setUp(self):
         self.valid_data_min = {
-            'profile[name]': 'Микола',
-            'profile[photo]': self._get_image(),
-            'rent_preferences[min_budget]': 1000,
-            'rent_preferences[max_budget]': 2000,
-            'about[birth_date]': '1960-02-02',
-            'about[gender]': 1,
-            'about[is_couple]': True,
-            'about[has_children]': False,
-            'rent_preferences[locations]': ['UA01', 'UA05']
+            'profile__name': 'Микола',
+            'profile__photo': self._get_image(),
+            'rent_preferences__min_budget': 1000,
+            'rent_preferences__max_budget': 2000,
+            'about__birth_date': '1960-02-02',
+            'about__gender': 1,
+            'about__is_couple': True,
+            'about__has_children': False,
+            'rent_preferences__locations[]': ['UA01', 'UA05']
         }
 
     def tearDown(self):
@@ -31,7 +31,6 @@ class ProfileCreateAPIViewTest(AuthorizedAPITestCase):
             UserProfile.objects.get(user=self.user).delete()
         except:
             pass
-
     def _get_response_shortcut(self, data: dict):
         url = 'profile-me'
         method = 'post'
@@ -54,9 +53,9 @@ class ProfileCreateAPIViewTest(AuthorizedAPITestCase):
              patch('shallwe_photo.facecheck.check_face_minified_temp', lambda x: True):
 
             data_tags_as_strs = self.valid_data_min | {
-                'rent_preferences[locations]': 'UA01',
-                'about[other_animals]': 'кіт',
-                'about[interests]': 'біг'
+                'rent_preferences__locations[]': ['UA01'],
+                'about__other_animals[]': ['кіт'],
+                'about__interests[]': ['біг']
             }
             response = self._get_response_shortcut(data_tags_as_strs)
             self.assertEqual(response.status_code, 201)
@@ -66,7 +65,7 @@ class ProfileCreateAPIViewTest(AuthorizedAPITestCase):
                 patch('shallwe_photo.facecheck.check_face_minified_temp', lambda x: True):
 
             data_min_budget_zero = self.valid_data_min | {
-                'rent_preferences[min_budget]': 0,
+                'rent_preferences__min_budget': 0,
             }
             response = self._get_response_shortcut(data_min_budget_zero)
             self.assertEqual(response.status_code, 201)
@@ -77,7 +76,7 @@ class ProfileCreateAPIViewTest(AuthorizedAPITestCase):
 
             # Wrong value
             invalid_data_wrong_value = self.valid_data_min | {
-                'profile[name]': 'М'
+                'profile__name': 'М'
             }
             response1 = self._get_response_shortcut(invalid_data_wrong_value)
             self.assertEqual(response1.status_code, 400)
@@ -85,11 +84,11 @@ class ProfileCreateAPIViewTest(AuthorizedAPITestCase):
 
             # Wrong attribute
             invalid_data_wrong_attribute = self.valid_data_min | {
-                'profile[hello]': 'Міша',
+                'profile__hello': 'Міша',
             }
             response2 = self._get_response_shortcut(invalid_data_wrong_attribute)
             self.assertEqual(response2.status_code, 400)
-            self.assertIn('profile[hello]', response2.data.get('error'))
+            self.assertIn('profile__hello', response2.data.get('error'))
 
 
 class ProfileUpdateAPIViewTest(AuthorizedAPITestCase):
@@ -160,20 +159,20 @@ class ProfileUpdateAPIViewTest(AuthorizedAPITestCase):
             return UserProfile.objects.get(pk=self.profile.pk)
 
         valid_data1 = {
-            'profile[name]': 'Мар\'яна',
-            'profile[photo]': self._get_image()
+            'profile__name': 'Мар\'яна',
+            'profile__photo': self._get_image()
         }
         check(valid_data1)
         self.assertEqual(get_profile().name, "Мар'яна")
 
         valid_data2 = {
-            'about[gender]': 2
+            'about__gender': 2
         }
         check(valid_data2)
         self.assertEqual(get_profile().about.gender, 2)
 
         valid_data3 = {
-            'rent_preferences[room_sharing_level]': 1
+            'rent_preferences__room_sharing_level': 1
         }
         check(valid_data3)
         self.assertEqual(get_profile().rent_preferences.room_sharing_level, 1)
@@ -190,10 +189,10 @@ class ProfileUpdateAPIViewTest(AuthorizedAPITestCase):
 
         # First, set some values that can be nullified
         update_data = {
-            'about[occupation_type]': 2,
-            'about[drinking_level]': 3,
-            'about[neighbourliness_level]': 2,
-            'about[bio]': 'Тестовий текст'
+            'about__occupation_type': 2,
+            'about__drinking_level': 3,
+            'about__neighbourliness_level': 2,
+            'about__bio': 'Тестовий текст'
         }
         check(update_data)
 
@@ -205,10 +204,10 @@ class ProfileUpdateAPIViewTest(AuthorizedAPITestCase):
 
         # Test with the string "null"
         nullify_data_with_null_string = {
-            'about[occupation_type]': 'null',
-            'about[drinking_level]': 'null',
-            'about[neighbourliness_level]': 'null',
-            'about[bio]': 'null'
+            'about__occupation_type': 'null',
+            'about__drinking_level': 'null',
+            'about__neighbourliness_level': 'null',
+            'about__bio': 'null'
         }
         check(nullify_data_with_null_string)
 
@@ -222,6 +221,7 @@ class ProfileUpdateAPIViewTest(AuthorizedAPITestCase):
 
 class ProfileReadAPIViewTest(AuthorizedAPITestCase):
     fixtures = ['locations_mini_fixture.json']
+    maxDiff = None
 
     def setUp(self):
         self.profile = self.createProfile()
