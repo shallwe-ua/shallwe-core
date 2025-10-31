@@ -7,7 +7,7 @@ from pathlib import Path
 from .envconfig.envconstants import *
 
 
-SHALLWE_BACKEND_VERSION = '0.7.2a1'
+SHALLWE_BACKEND_VERSION = '0.7.3a1'
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
